@@ -1,0 +1,298 @@
+@font-face {
+  font-family: Khat_Manzoor;
+  src: url('/fonts/_Khat_Manzoor.ttf');
+}
+
+:root {
+  --bg: #f5f5f3;
+  --panel: #ffffff;
+  --ink: #171717;
+  --muted: #6b7280;
+  --line: #d8d8d3;
+  --accent: #1f2937;
+  --accent-soft: #f0f1f3;
+  --danger: #b42318;
+  --danger-soft: #fee4e2;
+  --success: #027a48;
+  --success-soft: #d1fadf;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--bg);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: var(--accent-soft);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.primaryButton {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.primaryButton:hover:not(:disabled) {
+  background: #111827;
+}
+
+.dangerButton {
+  color: var(--danger);
+  border-color: #f5b5ae;
+}
+
+input,
+textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: white;
+  color: var(--ink);
+}
+
+textarea {
+  min-height: 76px;
+  resize: vertical;
+  line-height: 1.4;
+}
+
+label {
+  display: block;
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.appShell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.appHeader {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid var(--line);
+}
+
+.appTitle {
+  margin: 0;
+  font-size: 18px;
+}
+
+.appSubtitle {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.headerActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.mainGrid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(360px, 48%) minmax(420px, 52%);
+  min-height: 0;
+}
+
+.pdfPanel,
+.formPanel {
+  min-height: calc(100vh - 74px);
+  overflow: auto;
+}
+
+.pdfPanel {
+  border-right: 1px solid var(--line);
+  background: #e9e9e5;
+}
+
+.formPanel {
+  padding: 16px;
+}
+
+.uploadBox {
+  margin: 24px;
+  padding: 24px;
+  border: 2px dashed var(--line);
+  border-radius: 16px;
+  background: white;
+  text-align: center;
+}
+
+.uploadBox input {
+  max-width: 420px;
+}
+
+.pdfFrame {
+  width: 100%;
+  height: calc(100vh - 76px);
+  border: 0;
+  display: block;
+  background: white;
+}
+
+.emptyState {
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.notice {
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.errorBox {
+  border: 1px solid #f5b5ae;
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  white-space: pre-wrap;
+}
+
+.successBox {
+  border: 1px solid #7cd4a6;
+  background: var(--success-soft);
+  color: var(--success);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.letterCard {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.letterCardHeader {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.letterTitle {
+  margin: 0;
+  font-size: 16px;
+}
+
+.pagePill {
+  display: inline-block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.cardActions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.fieldFull {
+  grid-column: 1 / -1;
+}
+
+.fieldError {
+  color: var(--danger);
+  font-size: 12px;
+  line-height: 1.4;
+  margin-top: 6px;
+}
+
+input[aria-invalid='true'] {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.noteRequired {
+  border-color: #f9c74f;
+  background: #fff8e1;
+}
+
+.progressBar {
+  height: 10px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progressBar > div {
+  height: 100%;
+  background: var(--accent);
+  transition: width 180ms ease;
+}
+
+@media (max-width: 980px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .pdfPanel,
+  .formPanel {
+    min-height: auto;
+  }
+
+  .pdfFrame {
+    height: 55vh;
+  }
+}

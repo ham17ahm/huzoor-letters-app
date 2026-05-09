@@ -1,0 +1,159 @@
+.screen {
+  background: #f9f9f9;
+  min-height: 100vh;
+}
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #f3f3f3;
+  border-bottom: 1px solid #ddd;
+}
+
+.toolbarControls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.toolbarControls input {
+  width: 165px;
+  padding: 7px 8px;
+  background: white;
+}
+
+.container {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  margin: 20px auto;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  page-break-after: always;
+  border: 1px solid #ddd;
+  overflow: hidden;
+}
+
+.content {
+  padding: 7cm 3.75cm 2.5cm 4cm;
+}
+
+.content p {
+  margin-top: 2mm;
+  margin-bottom: 2mm;
+}
+
+.text {
+  font-size: 15pt;
+}
+
+.dateLocationCombined {
+  text-align: right;
+  font-size: 10pt;
+}
+
+.date {
+  text-decoration: overline;
+}
+
+.titleFullName {
+  margin-top: 3mm;
+  margin-bottom: 2mm;
+}
+
+.title,
+.fullName {
+  display: inline-block;
+}
+
+.salam {
+  text-align: center;
+  font-family: Khat_Manzoor, Arial, sans-serif;
+  font-size: 18pt;
+}
+
+.introText {
+  margin-bottom: 2mm;
+  text-align: justify;
+}
+
+.mainText,
+.noteText {
+  text-align: justify;
+}
+
+.wassalam {
+  font-style: italic;
+  margin-top: 2mm;
+  font-size: 15pt;
+}
+
+.greetingEnd {
+  margin-top: 2mm;
+  font-size: 15pt;
+}
+
+.signature {
+  margin-top: 18mm;
+  font-weight: bold;
+  font-size: 16pt;
+}
+
+.signatureTitle {
+  font-style: italic;
+  font-size: 14pt;
+  margin: 0;
+  position: relative;
+}
+
+.footnoteContainer {
+  position: absolute;
+  bottom: 2.5cm;
+  left: 4cm;
+  right: 3.75cm;
+  font-size: 10pt;
+  white-space: pre-wrap;
+}
+
+.footerLocation {
+  text-align: left;
+  font-size: 10pt;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  .screen {
+    background: white;
+  }
+
+  .toolbar {
+    display: none !important;
+  }
+
+  .container {
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    box-shadow: none;
+    border: none;
+    page-break-after: always;
+    break-after: page;
+    position: relative;
+  }
+
+  .content {
+    padding: 7cm 3.75cm 2.5cm 4cm;
+  }
+}

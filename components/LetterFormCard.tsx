@@ -1,0 +1,137 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import type { LetterRecord } from '@/types/letter';
+import { formatPageRange, parsePageRange } from '@/lib/pageRanges';
+
+type Props = {
+  letter: LetterRecord;
+  index: number;
+  total: number;
+  onChange: (updated: LetterRecord) => void;
+  onMergePrevious: () => void;
+  onMergeNext: () => void;
+  onRemove: () => void;
+};
+
+export function LetterFormCard({
+  letter,
+  index,
+  total,
+  onChange,
+  onMergePrevious,
+  onMergeNext,
+  onRemove
+}: Props) {
+  const update = (patch: Partial<LetterRecord>) => onChange({ ...letter, ...patch });
+  const missingNote = !letter.note.trim();
+  const [pagesInput, setPagesInput] = useState(formatPageRange(letter.source_pages));
+  const [pagesError, setPagesError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPagesInput(formatPageRange(letter.source_pages));
+    setPagesError(null);
+  }, [letter.source_pages]);
+
+  function commitPages(value: string) {
+    try {
+      const pages = parsePageRange(value);
+      setPagesError(null);
+      setPagesInput(formatPageRange(pages));
+      update({ source_pages: pages });
+    } catch (error) {
+      setPagesError(error instanceof Error ? error.message : 'Invalid page range.');
+    }
+  }
+
+  return (
+    <section className="letterCard">
+      <div className="letterCardHeader">
+        <div>
+          <h3 className="letterTitle">{letter.letter_id}</h3>
+          <span className="pagePill">Pages: {formatPageRange(letter.source_pages)}</span>
+        </div>
+        <div className="cardActions">
+          <button onClick={onMergePrevious} disabled={index === 0} title="Merge this letter into the previous one">
+            Merge previous
+          </button>
+          <button onClick={onMergeNext} disabled={index === total - 1} title="Merge this letter with the next one">
+            Merge next
+          </button>
+          <button className="dangerButton" onClick={onRemove} disabled={total <= 1}>
+            Remove
+          </button>
+        </div>
+      </div>
+
+      <div className="formGrid">
+        <div>
+          <label htmlFor={`${letter.letter_id}-pages`}>Source pages</label>
+          <input
+            id={`${letter.letter_id}-pages`}
+            value={pagesInput}
+            aria-invalid={Boolean(pagesError)}
+            onChange={(event) => {
+              setPagesInput(event.target.value);
+              if (pagesError) setPagesError(null);
+            }}
+            onBlur={(event) => commitPages(event.target.value)}
+            placeholder="1 or 1-3"
+          />
+          {pagesError ? <div className="fieldError">{pagesError}</div> : null}
+        </div>
+
+        <div>
+          <label htmlFor={`${letter.letter_id}-name`}>Full name</label>
+          <input
+            id={`${letter.letter_id}-name`}
+            value={letter.full_name}
+            onChange={(event) => update({ full_name: event.target.value })}
+            placeholder="Filled by Gemini"
+          />
+        </div>
+
+        <div>
+          <label htmlFor={`${letter.letter_id}-location`}>Location</label>
+          <input
+            id={`${letter.letter_id}-location`}
+            value={letter.location}
+            onChange={(event) => update({ location: event.target.value })}
+            placeholder="City, Country"
+          />
+        </div>
+
+        <div>
+          <label htmlFor={`${letter.letter_id}-note`}>Note {missingNote ? '(required)' : ''}</label>
+          <textarea
+            id={`${letter.letter_id}-note`}
+            className={missingNote ? 'noteRequired' : ''}
+            value={letter.note}
+            onChange={(event) => update({ note: event.target.value })}
+            placeholder="Type exact note here. Use Dua for prayers only."
+          />
+        </div>
+
+        <div className="fieldFull">
+          <label htmlFor={`${letter.letter_id}-inquiry`}>Inquiry</label>
+          <textarea
+            id={`${letter.letter_id}-inquiry`}
+            value={letter.inquiry}
+            onChange={(event) => update({ inquiry: event.target.value })}
+            placeholder="Filled by Gemini after notes are entered"
+          />
+        </div>
+
+        <div className="fieldFull">
+          <label htmlFor={`${letter.letter_id}-prayer`}>Prayer sentence</label>
+          <textarea
+            id={`${letter.letter_id}-prayer`}
+            value={letter.prayer_sentence}
+            onChange={(event) => update({ prayer_sentence: event.target.value })}
+            placeholder="Filled by Gemini after notes are entered"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
