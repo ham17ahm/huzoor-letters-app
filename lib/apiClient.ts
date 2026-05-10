@@ -1,8 +1,7 @@
 import type {
   AnalyzePdfResponse,
   ApiError,
-  GenerateRepliesResponse,
-  GenerateReplyResponse
+  GenerateRepliesResponse
 } from '@/types/api';
 import type { LetterRecord } from '@/types/letter';
 
@@ -17,27 +16,6 @@ export async function analyzePdfRequest(file: File, signal?: AbortSignal): Promi
   });
 
   return parseApiResponse<AnalyzePdfResponse>(response, 'Failed to analyze PDF.');
-}
-
-export async function generateReplyRequest(
-  pdfSessionId: string,
-  letter: LetterRecord,
-  signal?: AbortSignal
-): Promise<GenerateReplyResponse> {
-  const formData = new FormData();
-  formData.append('pdfSessionId', pdfSessionId);
-  formData.append('letter', JSON.stringify(letter));
-
-  const response = await fetch('/api/generate-reply', {
-    method: 'POST',
-    body: formData,
-    signal
-  });
-
-  return parseApiResponse<GenerateReplyResponse>(
-    response,
-    `Failed to generate reply for ${letter.letter_id}.`
-  );
 }
 
 export async function generateRepliesRequest(

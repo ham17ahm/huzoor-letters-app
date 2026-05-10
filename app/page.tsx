@@ -48,22 +48,6 @@ export default function Home() {
           {workflow.busyLabel ? (
             <div className="notice">
               <strong>{workflow.busyLabel}</strong>
-              {workflow.progress ? (
-                <>
-                  <div>
-                    {workflow.progress.label}: {workflow.progress.current} of {workflow.progress.total}
-                  </div>
-                  <div className="progressBar" aria-label="Generation progress">
-                    <div
-                      style={{
-                        width: `${Math.round(
-                          (workflow.progress.current / workflow.progress.total) * 100
-                        )}%`
-                      }}
-                    />
-                  </div>
-                </>
-              ) : null}
             </div>
           ) : null}
 

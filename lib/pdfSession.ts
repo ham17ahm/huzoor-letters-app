@@ -7,7 +7,6 @@ type PdfSession = {
 };
 
 declare global {
-  // eslint-disable-next-line no-var
   var __huzoorPdfSessions: Map<string, PdfSession> | undefined;
 }
 

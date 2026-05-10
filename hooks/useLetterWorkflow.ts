@@ -8,7 +8,7 @@ import {
   DEFAULT_LETTER_PROCESSORS
 } from '@/lib/letterProcessors';
 import type { LetterProcessor } from '@/lib/letterProcessors';
-import type { GenerationProgress, LetterRecord } from '@/types/letter';
+import type { LetterRecord } from '@/types/letter';
 
 type WorkflowState = {
   pdfFile: File | null;
@@ -19,7 +19,6 @@ type WorkflowState = {
   error: string | null;
   success: string | null;
   busyLabel: string | null;
-  progress: GenerationProgress | null;
 };
 
 type WorkflowApi = WorkflowState & {
@@ -46,8 +45,7 @@ const initialState: WorkflowState = {
   selectedIndex: 0,
   error: null,
   success: null,
-  busyLabel: null,
-  progress: null
+  busyLabel: null
 };
 
 export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): WorkflowApi {
@@ -94,7 +92,7 @@ export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): Workf
       activeRequestRef.current = null;
     }
     busyRef.current = false;
-    setState((current) => ({ ...current, busyLabel: null, progress: null }));
+    setState((current) => ({ ...current, busyLabel: null }));
   }
 
   function resetUiState() {
@@ -105,8 +103,7 @@ export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): Workf
       selectedIndex: 0,
       error: null,
       success: null,
-      busyLabel: null,
-      progress: null
+      busyLabel: null
     }));
   }
 
@@ -136,7 +133,6 @@ export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): Workf
       ...current,
       error: null,
       success: null,
-      progress: null,
       pdfSessionId: null
     }));
     await clearPdfSessionRequest(pdfSessionIdRef.current);

@@ -51,7 +51,7 @@ No DB/auth/persistence. Data is session-local.
 ### Client API Boundary
 
 - `lib/apiClient.ts`
-  - Typed wrappers for `/api/analyze-pdf`, `/api/generate-replies`, `/api/generate-reply`, `/api/clear-pdf`.
+  - Typed wrappers for `/api/analyze-pdf`, `/api/generate-replies`, `/api/clear-pdf`.
   - Centralized client-side response/error parsing.
 
 ### Server / AI Layer
@@ -63,9 +63,6 @@ No DB/auth/persistence. Data is session-local.
   - Uses existing PDF session + all letter payloads.
   - Makes one Gemini call for all requested letters.
   - Returns reply records keyed by `letter_id`.
-
-- `app/api/generate-reply/route.ts`
-  - Legacy/single-letter endpoint retained for fallback or future targeted retries.
 
 - `app/api/clear-pdf/route.ts`
   - Best-effort cleanup of temporary PDF session.
@@ -155,7 +152,7 @@ npm run dev
 - No database persistence.
 - In-memory PDF sessions only (not multi-instance durable).
 - No automated tests yet.
-- Lint script currently triggers interactive Next lint migration prompt.
+- `npm run lint`, `npm run typecheck`, and `npm run build` are the current verification commands.
 
 ---
 
@@ -169,5 +166,6 @@ Completed refactors in this phase:
 5. Switched forms UI from stacked list to single-letter workspace with sidebar/pagination.
 6. Changed print typography fallback from Arial to Times.
 7. Added dev/build artifact isolation in `next.config.ts`.
+8. Removed the legacy one-letter generation endpoint; generation is bulk-only through `/api/generate-replies`.
 
 The app is currently in a stable, extensible state aligned with these changes.
