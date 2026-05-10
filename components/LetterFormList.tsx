@@ -1,14 +1,18 @@
 'use client';
 
 import { LetterFormCard } from '@/components/LetterFormCard';
+import { LetterPagination } from '@/components/LetterPagination';
+import { LetterSidebar } from '@/components/LetterSidebar';
 import type { LetterRecord } from '@/types/letter';
 
 type Props = {
   letters: LetterRecord[];
-  onLettersChange: (letters: LetterRecord[]) => void;
+  selectedIndex: number;
+  onSelectLetter: (index: number) => void;
+  onLettersChange: (letters: LetterRecord[], options?: { nextSelectedIndex?: number }) => void;
 };
 
-export function LetterFormList({ letters, onLettersChange }: Props) {
+export function LetterFormList({ letters, selectedIndex, onSelectLetter, onLettersChange }: Props) {
   if (!letters.length) {
     return (
       <div className="emptyState">
@@ -18,10 +22,13 @@ export function LetterFormList({ letters, onLettersChange }: Props) {
     );
   }
 
+  const activeIndex = resolveIndex(selectedIndex, letters.length);
+  const selectedLetter = letters[activeIndex];
+
   function setLetter(index: number, updated: LetterRecord) {
     const next = [...letters];
     next[index] = updated;
-    onLettersChange(resequence(next));
+    onLettersChange(resequence(next), { nextSelectedIndex: index });
   }
 
   function mergeAt(index: number, direction: 'previous' | 'next') {
@@ -45,33 +52,51 @@ export function LetterFormList({ letters, onLettersChange }: Props) {
 
     const next = [...letters];
     next.splice(targetIndex, 2, merged);
-    onLettersChange(resequence(next));
+    onLettersChange(resequence(next), { nextSelectedIndex: targetIndex });
   }
 
   function removeAt(index: number) {
     const next = letters.filter((_, i) => i !== index);
-    onLettersChange(resequence(next));
+    const nextSelectedIndex = Math.min(index, Math.max(next.length - 1, 0));
+    onLettersChange(resequence(next), { nextSelectedIndex });
   }
 
   return (
-    <>
-      <div className="notice">
-        <strong>{letters.length}</strong> letter form(s). Enter one note per letter, then click Generate Replies.
-      </div>
-      {letters.map((letter, index) => (
-        <LetterFormCard
-          key={letter.letter_id}
-          letter={letter}
-          index={index}
+    <div className="letterWorkspace">
+      <LetterSidebar letters={letters} selectedIndex={activeIndex} onSelect={onSelectLetter} />
+
+      <div className="letterEditor">
+        <div className="notice">
+          <strong>{letters.length}</strong> letter form(s). Enter one note per letter, then click Generate Replies.
+        </div>
+
+        <LetterPagination
+          currentIndex={activeIndex}
           total={letters.length}
-          onChange={(updated) => setLetter(index, updated)}
-          onMergePrevious={() => mergeAt(index, 'previous')}
-          onMergeNext={() => mergeAt(index, 'next')}
-          onRemove={() => removeAt(index)}
+          onPrevious={() => onSelectLetter(activeIndex - 1)}
+          onNext={() => onSelectLetter(activeIndex + 1)}
         />
-      ))}
-    </>
+
+        <LetterFormCard
+          key={selectedLetter.letter_id}
+          letter={selectedLetter}
+          index={activeIndex}
+          total={letters.length}
+          onChange={(updated) => setLetter(activeIndex, updated)}
+          onMergePrevious={() => mergeAt(activeIndex, 'previous')}
+          onMergeNext={() => mergeAt(activeIndex, 'next')}
+          onRemove={() => removeAt(activeIndex)}
+        />
+      </div>
+    </div>
   );
+}
+
+function resolveIndex(index: number, length: number): number {
+  if (length <= 0) return 0;
+  if (index < 0) return 0;
+  if (index >= length) return length - 1;
+  return index;
 }
 
 function resequence(letters: LetterRecord[]): LetterRecord[] {

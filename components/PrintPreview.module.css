@@ -40,6 +40,7 @@
   page-break-after: always;
   border: 1px solid #ddd;
   overflow: hidden;
+  font-family: 'Times New Roman', Times, serif;
 }
 
 .content {
@@ -76,7 +77,7 @@
 
 .salam {
   text-align: center;
-  font-family: Khat_Manzoor, Arial, sans-serif;
+  font-family: Khat_Manzoor, 'Times New Roman', Times, serif;
   font-size: 18pt;
 }
 

@@ -205,6 +205,97 @@ label {
   margin-bottom: 12px;
 }
 
+.letterWorkspace {
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.letterSidebar {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+  overflow: hidden;
+  align-self: start;
+}
+
+.letterSidebarHeader {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.letterSidebarList {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 250px);
+  overflow: auto;
+}
+
+.letterSidebarItem {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  text-align: left;
+  padding: 10px 12px;
+  display: grid;
+  gap: 3px;
+}
+
+.letterSidebarItem:last-child {
+  border-bottom: 0;
+}
+
+.letterSidebarItem.isSelected {
+  background: var(--accent-soft);
+}
+
+.letterSidebarTitle {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.letterSidebarMeta {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.letterSidebarStatus {
+  font-size: 12px;
+}
+
+.letterSidebarStatus.done {
+  color: var(--success);
+}
+
+.letterSidebarStatus.missing {
+  color: #a15c00;
+}
+
+.letterEditor {
+  min-width: 0;
+}
+
+.letterPagination {
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 12px;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.letterPaginationLabel {
+  font-size: 13px;
+  color: var(--muted);
+}
+
 .letterCard {
   background: var(--panel);
   border: 1px solid var(--line);
@@ -294,5 +385,13 @@ input[aria-invalid='true'] {
 
   .pdfFrame {
     height: 55vh;
+  }
+
+  .letterWorkspace {
+    grid-template-columns: 1fr;
+  }
+
+  .letterSidebarList {
+    max-height: 34vh;
   }
 }

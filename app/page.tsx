@@ -74,7 +74,12 @@ export default function Home() {
           {workflow.error ? <div className="errorBox">{workflow.error}</div> : null}
           {workflow.success ? <div className="successBox">{workflow.success}</div> : null}
 
-          <LetterFormList letters={workflow.letters} onLettersChange={workflow.setLetters} />
+          <LetterFormList
+            letters={workflow.letters}
+            selectedIndex={workflow.selectedIndex}
+            onSelectLetter={workflow.setSelectedIndex}
+            onLettersChange={workflow.setLetters}
+          />
         </section>
       </main>
     </div>

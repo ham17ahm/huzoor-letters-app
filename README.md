@@ -117,3 +117,4 @@ npm install --registry=https://registry.npmjs.org/ --verbose
 ```
 
 Use Node 20 LTS if possible. Node 18.18+ is required by Next.js 15.
+Avoid Node 24 for this app; it can cause `.next/server` chunk runtime mismatches in local dev.

@@ -15,6 +15,7 @@ type WorkflowState = {
   pdfUrl: string | null;
   pdfSessionId: string | null;
   letters: LetterRecord[];
+  selectedIndex: number;
   error: string | null;
   success: string | null;
   busyLabel: string | null;
@@ -26,7 +27,8 @@ type WorkflowApi = WorkflowState & {
   isBusy: boolean;
   hasPdf: boolean;
   hasLetters: boolean;
-  setLetters: (letters: LetterRecord[]) => void;
+  setLetters: (letters: LetterRecord[], options?: { nextSelectedIndex?: number }) => void;
+  setSelectedIndex: (index: number) => void;
   setPrintMode: (value: boolean) => void;
   handleFileSelected: (file: File) => void;
   analyzePdf: () => Promise<void>;
@@ -43,6 +45,7 @@ const initialState: WorkflowState = {
   pdfUrl: null,
   pdfSessionId: null,
   letters: [],
+  selectedIndex: 0,
   error: null,
   success: null,
   busyLabel: null,
@@ -102,6 +105,7 @@ export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): Workf
       ...current,
       pdfSessionId: null,
       letters: [],
+      selectedIndex: 0,
       error: null,
       success: null,
       busyLabel: null,
@@ -147,6 +151,7 @@ export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): Workf
         ...current,
         pdfSessionId: data.pdfSessionId,
         letters: data.letters,
+        selectedIndex: 0,
         success: `Gemini detected ${data.letters.length} letter(s). Enter notes, then generate replies.`
       }));
     } catch (error) {
@@ -193,6 +198,7 @@ export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): Workf
 
         setState((current) => ({
           ...current,
+          selectedIndex: index,
           progress: { current: index + 1, total: nextLetters.length, label: letter.letter_id }
         }));
 
@@ -243,7 +249,20 @@ export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): Workf
     isBusy: Boolean(state.busyLabel),
     hasPdf: Boolean(state.pdfFile),
     hasLetters: state.letters.length > 0,
-    setLetters: (letters) => setState((current) => ({ ...current, letters })),
+    setLetters: (letters, options) =>
+      setState((current) => ({
+        ...current,
+        letters,
+        selectedIndex: resolveSelectedIndex(
+          options?.nextSelectedIndex ?? current.selectedIndex,
+          letters.length
+        )
+      })),
+    setSelectedIndex: (index) =>
+      setState((current) => ({
+        ...current,
+        selectedIndex: resolveSelectedIndex(index, current.letters.length)
+      })),
     setPrintMode: (value) => setState((current) => ({ ...current, printMode: value })),
     handleFileSelected,
     analyzePdf,
@@ -254,4 +273,11 @@ export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): Workf
 
 function isAbortError(error: unknown): boolean {
   return error instanceof DOMException && error.name === 'AbortError';
+}
+
+function resolveSelectedIndex(index: number, letterCount: number): number {
+  if (letterCount <= 0) return 0;
+  if (index < 0) return 0;
+  if (index >= letterCount) return letterCount - 1;
+  return index;
 }
