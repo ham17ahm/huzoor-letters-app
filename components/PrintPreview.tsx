@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { LetterRecord } from '@/types/letter';
 import { formatHmDate } from '@/lib/date';
 import { PRINT_HEADER_LOCATION } from '@/lib/printConfig';
@@ -12,7 +12,11 @@ type Props = {
 };
 
 export function PrintPreview({ letters, onClose }: Props) {
-  const [hmDate, setHmDate] = useState(formatHmDate());
+  const [hmDate, setHmDate] = useState('');
+
+  useEffect(() => {
+    setHmDate(formatHmDate());
+  }, []);
 
   return (
     <div className={styles.screen}>
