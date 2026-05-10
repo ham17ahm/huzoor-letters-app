@@ -130,7 +130,7 @@ label {
 .mainGrid {
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(360px, 48%) minmax(420px, 52%);
+  grid-template-columns: minmax(320px, 40%) minmax(460px, 60%);
   min-height: 0;
 }
 
@@ -207,7 +207,7 @@ label {
 
 .letterWorkspace {
   display: grid;
-  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+  grid-template-columns: minmax(96px, 120px) minmax(0, 1fr);
   gap: 12px;
 }
 
@@ -313,6 +313,13 @@ label {
   margin-bottom: 12px;
 }
 
+.letterMetaRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .letterTitle {
   margin: 0;
   font-size: 16px;
@@ -320,9 +327,15 @@ label {
 
 .pagePill {
   display: inline-block;
-  margin-top: 4px;
   color: var(--muted);
   font-size: 12px;
+}
+
+.pageInlineInput {
+  width: 128px;
+  padding: 6px 8px;
+  font-size: 12px;
+  border-radius: 8px;
 }
 
 .cardActions {

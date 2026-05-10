@@ -47,9 +47,23 @@ export function LetterFormCard({
   return (
     <section className="letterCard">
       <div className="letterCardHeader">
-        <div>
+        <div className="letterMetaRow">
           <h3 className="letterTitle">{letter.letter_id}</h3>
-          <span className="pagePill">Pages: {formatPageRange(letter.source_pages)}</span>
+          <span className="pagePill">Pages</span>
+          <input
+            id={`${letter.letter_id}-pages`}
+            className="pageInlineInput"
+            value={pagesInput}
+            aria-label={`Source pages for ${letter.letter_id}`}
+            aria-invalid={Boolean(pagesError)}
+            onChange={(event) => {
+              setPagesInput(event.target.value);
+              if (pagesError) setPagesError(null);
+            }}
+            onBlur={(event) => commitPages(event.target.value)}
+            placeholder="1 or 1-3"
+          />
+          {pagesError ? <div className="fieldError">{pagesError}</div> : null}
         </div>
         <div className="cardActions">
           <button onClick={onMergePrevious} disabled={index === 0} title="Merge this letter into the previous one">
@@ -65,22 +79,6 @@ export function LetterFormCard({
       </div>
 
       <div className="formGrid">
-        <div>
-          <label htmlFor={`${letter.letter_id}-pages`}>Source pages</label>
-          <input
-            id={`${letter.letter_id}-pages`}
-            value={pagesInput}
-            aria-invalid={Boolean(pagesError)}
-            onChange={(event) => {
-              setPagesInput(event.target.value);
-              if (pagesError) setPagesError(null);
-            }}
-            onBlur={(event) => commitPages(event.target.value)}
-            placeholder="1 or 1-3"
-          />
-          {pagesError ? <div className="fieldError">{pagesError}</div> : null}
-        </div>
-
         <div>
           <label htmlFor={`${letter.letter_id}-name`}>Full name</label>
           <input
@@ -101,11 +99,12 @@ export function LetterFormCard({
           />
         </div>
 
-        <div>
+        <div className="fieldFull">
           <label htmlFor={`${letter.letter_id}-note`}>Note {missingNote ? '(required)' : ''}</label>
           <textarea
             id={`${letter.letter_id}-note`}
             className={missingNote ? 'noteRequired' : ''}
+            autoFocus
             value={letter.note}
             onChange={(event) => update({ note: event.target.value })}
             placeholder="Type exact note here. Use Dua for prayers only."

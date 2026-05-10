@@ -17,7 +17,7 @@ export function LetterFormList({ letters, selectedIndex, onSelectLetter, onLette
     return (
       <div className="emptyState">
         <h2>No letters detected yet</h2>
-        <p>Upload a PDF, then click Gemini Magic to create forms.</p>
+        <p>Upload a PDF, then click Detect PDF to create forms.</p>
       </div>
     );
   }

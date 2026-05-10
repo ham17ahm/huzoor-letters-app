@@ -10,7 +10,7 @@ type Props = {
 
 export function Toolbar({
   title = 'Letters Processor',
-  subtitle = 'Upload → Gemini Magic → Notes → Generate Replies → Review → Print',
+  subtitle = 'Upload → Detect PDF → Notes → Generate Replies → Review → Print',
   actions
 }: Props) {
   return (

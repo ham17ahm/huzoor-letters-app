@@ -6,7 +6,7 @@ A local, browser-based Next.js app for processing PDF packets of correspondence 
 
 1. Upload one PDF packet.
 2. Preview the PDF on the left.
-3. Click **Gemini Magic** to detect individual letters and source pages.
+3. Click **Detect PDF** to detect individual letters and source pages.
 4. Enter one note per letter.
 5. Click **Generate Replies** to process each letter one-by-one with Gemini, using the already-uploaded temporary PDF session.
 6. Review and edit every field.
