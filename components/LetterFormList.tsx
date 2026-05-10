@@ -3,14 +3,6 @@
 import { LetterFormCard } from '@/components/LetterFormCard';
 import type { LetterRecord } from '@/types/letter';
 
-const emptyFields = {
-  full_name: '',
-  location: '',
-  note: '',
-  inquiry: '',
-  prayer_sentence: ''
-};
-
 type Props = {
   letters: LetterRecord[];
   onLettersChange: (letters: LetterRecord[]) => void;

@@ -1,44 +1,42 @@
 'use client';
 
+import type { ToolbarAction } from '@/types/toolbar';
+
 type Props = {
-  hasPdf: boolean;
-  hasLetters: boolean;
-  isBusy: boolean;
-  onAnalyze: () => void;
-  onGenerate: () => void;
-  onPrint: () => void;
-  onReset: () => void;
+  title?: string;
+  subtitle?: string;
+  actions: ToolbarAction[];
 };
 
 export function Toolbar({
-  hasPdf,
-  hasLetters,
-  isBusy,
-  onAnalyze,
-  onGenerate,
-  onPrint,
-  onReset
+  title = 'Letters Processor',
+  subtitle = 'Upload → Gemini Magic → Notes → Generate Replies → Review → Print',
+  actions
 }: Props) {
   return (
     <header className="appHeader no-print">
       <div>
-        <h1 className="appTitle">Letters Processor</h1>
-        <p className="appSubtitle">Upload → Gemini Magic → Notes → Generate Replies → Review → Print</p>
+        <h1 className="appTitle">{title}</h1>
+        <p className="appSubtitle">{subtitle}</p>
       </div>
       <div className="headerActions">
-        <button className="primaryButton" onClick={onAnalyze} disabled={!hasPdf || isBusy}>
-          Gemini Magic
-        </button>
-        <button onClick={onGenerate} disabled={!hasPdf || !hasLetters || isBusy}>
-          Generate Replies
-        </button>
-        <button onClick={onPrint} disabled={!hasLetters || isBusy}>
-          Print / PDF
-        </button>
-        <button onClick={onReset} disabled={isBusy}>
-          Reset
-        </button>
+        {actions.map((action) => (
+          <button
+            key={action.id}
+            className={buttonClassName(action)}
+            onClick={action.onClick}
+            disabled={action.disabled}
+          >
+            {action.label}
+          </button>
+        ))}
       </div>
     </header>
   );
+}
+
+function buttonClassName(action: ToolbarAction): string | undefined {
+  if (action.variant === 'primary') return 'primaryButton';
+  if (action.variant === 'danger') return 'dangerButton';
+  return undefined;
 }
