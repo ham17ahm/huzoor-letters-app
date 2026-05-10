@@ -8,7 +8,7 @@ A local, browser-based Next.js app for processing PDF packets of correspondence 
 2. Preview the PDF on the left.
 3. Click **Detect PDF** to detect individual letters and source pages.
 4. Enter one note per letter.
-5. Click **Generate Replies** to process each letter one-by-one with Gemini, using the already-uploaded temporary PDF session.
+5. Click **Generate Replies** to process all letters in one Gemini request, using the already-uploaded temporary PDF session.
 6. Review and edit every field.
 7. Click **Print / PDF** to create one A4 reply page per letter and save through Chrome's print dialog.
 
@@ -17,7 +17,7 @@ A local, browser-based Next.js app for processing PDF packets of correspondence 
 - No database.
 - No login.
 - No permanent PDF storage.
-- Uploaded PDFs are held in a temporary in-memory server session after analysis so the same PDF is not re-uploaded for every letter.
+- Uploaded PDFs are held in a temporary in-memory server session after analysis so generation can reuse the PDF without another browser upload.
 - The temporary PDF session is cleared on reset/file change and also expires automatically.
 - Extracted records exist only in the current browser session.
 - PDFs are sent to Gemini during processing because Gemini must read the document.

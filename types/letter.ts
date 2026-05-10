@@ -15,6 +15,8 @@ export type GenerateReplyResult = Pick<
   'full_name' | 'location' | 'inquiry' | 'prayer_sentence'
 >;
 
+export type BulkGenerateReplyResult = GenerateReplyResult & Pick<LetterRecord, 'letter_id'>;
+
 export type GenerationProgress = {
   current: number;
   total: number;

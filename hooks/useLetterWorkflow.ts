@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { analyzePdfRequest, clearPdfSessionRequest, generateReplyRequest } from '@/lib/apiClient';
+import { analyzePdfRequest, clearPdfSessionRequest, generateRepliesRequest } from '@/lib/apiClient';
 import {
   applyAfterGenerateProcessors,
   applyBeforeGenerateProcessors,
@@ -20,7 +20,6 @@ type WorkflowState = {
   success: string | null;
   busyLabel: string | null;
   progress: GenerationProgress | null;
-  printMode: boolean;
 };
 
 type WorkflowApi = WorkflowState & {
@@ -29,7 +28,6 @@ type WorkflowApi = WorkflowState & {
   hasLetters: boolean;
   setLetters: (letters: LetterRecord[], options?: { nextSelectedIndex?: number }) => void;
   setSelectedIndex: (index: number) => void;
-  setPrintMode: (value: boolean) => void;
   handleFileSelected: (file: File) => void;
   analyzePdf: () => Promise<void>;
   generateReplies: () => Promise<void>;
@@ -49,8 +47,7 @@ const initialState: WorkflowState = {
   error: null,
   success: null,
   busyLabel: null,
-  progress: null,
-  printMode: false
+  progress: null
 };
 
 export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): WorkflowApi {
@@ -109,8 +106,7 @@ export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): Workf
       error: null,
       success: null,
       busyLabel: null,
-      progress: null,
-      printMode: false
+      progress: null
     }));
   }
 
@@ -184,38 +180,47 @@ export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): Workf
     if (!signal) return;
 
     setState((current) => ({ ...current, error: null, success: null }));
-    const nextLetters = [...state.letters];
+    const pdfSessionId = state.pdfSessionId;
 
     try {
-      for (let index = 0; index < nextLetters.length; index += 1) {
-        const letter = nextLetters[index];
+      const requestLetters = state.letters.map((letter, index) => {
         const context = {
           index,
-          total: nextLetters.length,
-          pdfSessionId: state.pdfSessionId
+          total: state.letters.length,
+          pdfSessionId
         };
-        const requestLetter = applyBeforeGenerateProcessors(letter, processors, context);
+        return applyBeforeGenerateProcessors(letter, processors, context);
+      });
 
-        setState((current) => ({
-          ...current,
-          selectedIndex: index,
-          progress: { current: index + 1, total: nextLetters.length, label: letter.letter_id }
-        }));
+      const data = await generateRepliesRequest(pdfSessionId, requestLetters, signal);
+      const repliesById = new Map(data.replies.map((reply) => [reply.letter_id, reply]));
+      const nextLetters = state.letters.map((letter, index) => {
+        const reply = repliesById.get(letter.letter_id);
+        if (!reply) return letter;
 
-        const data = await generateReplyRequest(state.pdfSessionId, requestLetter, signal);
+        const context = {
+          index,
+          total: state.letters.length,
+          pdfSessionId
+        };
+        const requestLetter = requestLetters[index];
         const generatedLetter = {
           ...letter,
-          ...data.reply
+          full_name: reply.full_name,
+          location: reply.location,
+          inquiry: reply.inquiry,
+          prayer_sentence: reply.prayer_sentence
         };
-        nextLetters[index] = applyAfterGenerateProcessors(generatedLetter, processors, {
+
+        return applyAfterGenerateProcessors(generatedLetter, processors, {
           ...context,
           originalLetter: letter,
           requestLetter,
-          reply: data.reply
+          reply
         });
+      });
 
-        setState((current) => ({ ...current, letters: [...nextLetters] }));
-      }
+      setState((current) => ({ ...current, letters: nextLetters }));
 
       setState((current) => ({
         ...current,
@@ -263,7 +268,6 @@ export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): Workf
         ...current,
         selectedIndex: resolveSelectedIndex(index, current.letters.length)
       })),
-    setPrintMode: (value) => setState((current) => ({ ...current, printMode: value })),
     handleFileSelected,
     analyzePdf,
     generateReplies,

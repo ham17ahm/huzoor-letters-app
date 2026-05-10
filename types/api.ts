@@ -1,4 +1,4 @@
-import type { GenerateReplyResult, LetterRecord } from '@/types/letter';
+import type { BulkGenerateReplyResult, GenerateReplyResult, LetterRecord } from '@/types/letter';
 
 export type ApiError = {
   error?: string;
@@ -12,5 +12,10 @@ export type AnalyzePdfResponse = {
 
 export type GenerateReplyResponse = {
   reply: GenerateReplyResult;
+  rawText?: string;
+};
+
+export type GenerateRepliesResponse = {
+  replies: BulkGenerateReplyResult[];
   rawText?: string;
 };

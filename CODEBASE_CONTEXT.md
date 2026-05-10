@@ -28,6 +28,8 @@ No DB/auth/persistence. Data is session-local.
 - `app/page.tsx`
   - Thin composition layer.
   - Binds workflow hook state/actions to UI components.
+- `app/print/page.tsx`
+  - Dedicated print-preview entry route opened in a new tab.
 
 - `components/*`
   - Presentational/editor components:
@@ -49,7 +51,7 @@ No DB/auth/persistence. Data is session-local.
 ### Client API Boundary
 
 - `lib/apiClient.ts`
-  - Typed wrappers for `/api/analyze-pdf`, `/api/generate-reply`, `/api/clear-pdf`.
+  - Typed wrappers for `/api/analyze-pdf`, `/api/generate-replies`, `/api/generate-reply`, `/api/clear-pdf`.
   - Centralized client-side response/error parsing.
 
 ### Server / AI Layer
@@ -57,9 +59,13 @@ No DB/auth/persistence. Data is session-local.
 - `app/api/analyze-pdf/route.ts`
   - Accepts PDF, stores temporary PDF session, asks Gemini for boundaries.
 
+- `app/api/generate-replies/route.ts`
+  - Uses existing PDF session + all letter payloads.
+  - Makes one Gemini call for all requested letters.
+  - Returns reply records keyed by `letter_id`.
+
 - `app/api/generate-reply/route.ts`
-  - Uses existing PDF session + one letter payload.
-  - Asks Gemini for `full_name`, `location`, `inquiry`, `prayer_sentence`.
+  - Legacy/single-letter endpoint retained for fallback or future targeted retries.
 
 - `app/api/clear-pdf/route.ts`
   - Best-effort cleanup of temporary PDF session.
@@ -90,12 +96,14 @@ No DB/auth/persistence. Data is session-local.
 
 ### Generation mode
 
-- `Generate Replies` still runs for **all letters sequentially**.
-- During generation, selection auto-focuses the current letter.
+- `Generate Replies` runs for **all letters in one bulk Gemini request**.
+- The request includes the full PDF plus each letter's `letter_id`, `source_pages`, and user note.
+- The response is merged back into forms by `letter_id`.
 
 ### Print mode
 
-- Prints all letters.
+- Clicking `Print / PDF` opens `/print` in a **new tab**.
+- Prints all letters from that tab.
 - Print template now uses Times (`Times New Roman`) instead of Arial fallback.
 
 ---

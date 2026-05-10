@@ -2,9 +2,9 @@
 
 import { LetterFormList } from '@/components/LetterFormList';
 import { PdfViewer } from '@/components/PdfViewer';
-import { PrintPreview } from '@/components/PrintPreview';
 import { Toolbar } from '@/components/Toolbar';
 import { useLetterWorkflow } from '@/hooks/useLetterWorkflow';
+import { openPrintPreviewTab } from '@/lib/printPreviewSession';
 import { TOOLBAR_ACTIONS } from '@/lib/toolbarConfig';
 import type { ToolbarAction, ToolbarActionId } from '@/types/toolbar';
 
@@ -21,7 +21,7 @@ export default function Home() {
   const handlerById: Record<ToolbarActionId, () => void> = {
     analyze: () => void workflow.analyzePdf(),
     generate: () => void workflow.generateReplies(),
-    print: () => workflow.setPrintMode(true),
+    print: () => openPrintPreviewTab(workflow.letters),
     reset: workflow.resetAll
   };
 
@@ -30,10 +30,6 @@ export default function Home() {
     disabled: disabledById[action.id],
     onClick: handlerById[action.id]
   }));
-
-  if (workflow.printMode) {
-    return <PrintPreview letters={workflow.letters} onClose={() => workflow.setPrintMode(false)} />;
-  }
 
   return (
     <div className="appShell">
