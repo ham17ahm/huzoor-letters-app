@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { generateWithGeminiPdf } from '@/lib/gemini';
+import { generateWithGeminiPdf, getGenerateRepliesModel } from '@/lib/gemini';
 import { parseJsonFromText } from '@/lib/json';
 import { buildGenerateRepliesPrompt } from '@/lib/prompts';
 import { normalizeBulkReplies } from '@/lib/validators';
@@ -33,10 +33,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: `Missing note for ${missingNote.letter_id}.` }, { status: 400 });
     }
 
+    const prompt = buildGenerateRepliesPrompt(letters);
+    console.log('[Gemini][generate-replies] Final constructed prompt:\n', prompt);
+
     const pdfBase64 = getPdfSession(pdfSessionId);
     const rawText = await generateWithGeminiPdf({
       pdfBase64,
-      prompt: buildGenerateRepliesPrompt(letters),
+      prompt,
+      model: getGenerateRepliesModel(),
       signal: request.signal
     });
 

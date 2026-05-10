@@ -9,7 +9,7 @@ A local, browser-based Next.js app for processing PDF packets of correspondence 
 3. Click **Detect PDF** to detect individual letters and source pages.
 4. Enter one note per letter.
 5. Click **Generate Replies** to process all letters in one Gemini request, using the already-uploaded temporary PDF session.
-6. Review and edit every field.
+6. Review and edit every field. In the letter form, generated/editable text is ordered as Inquiry, Note, then Prayer sentence.
 7. Click **Print / PDF** to create one A4 reply page per letter and save through Chrome's print dialog.
 
 ## Privacy model
@@ -51,8 +51,26 @@ The font file is not included. If you have the font, place it at that path. The 
 
 ```text
 GEMINI_API_KEY=...
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_DETECT_PDF_MODEL=gemini-2.5-flash
+GEMINI_GENERATE_REPLIES_MODEL=gemini-2.5-flash
 ```
+
+`GEMINI_MODEL` is still supported as a fallback if either workflow-specific model is not set.
+
+Model selection is intentionally route-specific:
+
+- Detect PDF uses `GEMINI_DETECT_PDF_MODEL`.
+- Generate Replies uses `GEMINI_GENERATE_REPLIES_MODEL`.
+- If one of those is missing, the code falls back to `GEMINI_MODEL`, then to the built-in default.
+
+## Gemini request details
+
+- PDF detection and reply generation both send the PDF as inline base64 data to Gemini.
+- Generate Replies builds its prompt in `buildGenerateRepliesPrompt` using each letter's `letter_id`, formatted `source_pages`, and user-entered `note`.
+- The Generate Replies prompt is structured with XML-style sections such as role, task, requested letters, note handling, field specifications, examples, edge cases, validation checklist, and output format.
+- `source_pages` is formatted by `formatPageRange` as strings like `5`, `1-3`, or `1, 3-4, 7`.
+- Server logs currently print the constructed Gemini request body in `lib/gemini.ts`; this includes the full PDF base64 and can be very large.
+- The Generate Replies route also logs the final constructed prompt text before calling Gemini.
 
 ## Important v1 limitations
 
@@ -70,6 +88,10 @@ GEMINI_MODEL=gemini-2.5-flash
 - `lib/apiClient.ts`
   - Typed client-side API functions for `/api/*` calls.
   - Add or adjust request/response logic here first.
+- `lib/gemini.ts`
+  - Shared Gemini request helper.
+  - Accepts the selected model explicitly from each route.
+  - Exposes `getDetectPdfModel()` and `getGenerateRepliesModel()` for simple workflow-specific model configuration.
 - `lib/letterProcessors.ts`
   - Per-letter plugin pipeline for generation with `beforeGenerate` and `afterGenerate` hooks.
   - Use this for feature additions that need letter-level transformations or policies.

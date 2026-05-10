@@ -100,6 +100,16 @@ export function LetterFormCard({
         </div>
 
         <div className="fieldFull">
+          <label htmlFor={`${letter.letter_id}-inquiry`}>Inquiry</label>
+          <textarea
+            id={`${letter.letter_id}-inquiry`}
+            value={letter.inquiry}
+            onChange={(event) => update({ inquiry: event.target.value })}
+            placeholder="Filled by Gemini after notes are entered"
+          />
+        </div>
+
+        <div className="fieldFull">
           <label htmlFor={`${letter.letter_id}-note`}>Note {missingNote ? '(required)' : ''}</label>
           <textarea
             id={`${letter.letter_id}-note`}
@@ -108,16 +118,6 @@ export function LetterFormCard({
             value={letter.note}
             onChange={(event) => update({ note: event.target.value })}
             placeholder="Type exact note here. Use Dua for prayers only."
-          />
-        </div>
-
-        <div className="fieldFull">
-          <label htmlFor={`${letter.letter_id}-inquiry`}>Inquiry</label>
-          <textarea
-            id={`${letter.letter_id}-inquiry`}
-            value={letter.inquiry}
-            onChange={(event) => update({ inquiry: event.target.value })}
-            placeholder="Filled by Gemini after notes are entered"
           />
         </div>
 

@@ -58,19 +58,23 @@ No DB/auth/persistence. Data is session-local.
 
 - `app/api/analyze-pdf/route.ts`
   - Accepts PDF, stores temporary PDF session, asks Gemini for boundaries.
+  - Uses `getDetectPdfModel()` so PDF detection can run on its own Gemini model.
 
 - `app/api/generate-replies/route.ts`
   - Uses existing PDF session + all letter payloads.
   - Makes one Gemini call for all requested letters.
   - Returns reply records keyed by `letter_id`.
+  - Uses `getGenerateRepliesModel()` so reply generation can run on its own Gemini model.
+  - Logs the final constructed prompt text before calling Gemini.
 
 - `app/api/clear-pdf/route.ts`
   - Best-effort cleanup of temporary PDF session.
 
 ### Domain/Utility Layer
 
-- `lib/gemini.ts` — Gemini call implementation.
+- `lib/gemini.ts` — Gemini call implementation and workflow-specific model selectors.
 - `lib/prompts.ts` — boundary + reply prompt builders.
+  - Generate Replies prompt uses XML-style sections for role, task, requested letters, note handling, field specifications, examples, edge cases, validation checklist, and output format.
 - `lib/validators.ts` — normalization of Gemini output.
 - `lib/json.ts` — robust JSON extraction from model text.
 - `lib/pageRanges.ts` — parse/format page ranges.
@@ -90,11 +94,20 @@ No DB/auth/persistence. Data is session-local.
   - note status
 - Prev/Next pagination available.
 - Jump-to-letter by sidebar click.
+- Main editable text fields are ordered as:
+  - Inquiry
+  - Note
+  - Prayer sentence
 
 ### Generation mode
 
 - `Generate Replies` runs for **all letters in one bulk Gemini request**.
 - The request includes the full PDF plus each letter's `letter_id`, `source_pages`, and user note.
+- `source_pages` is converted from `number[]` into a compact string with `formatPageRange`, for example:
+  - `5`
+  - `1-3`
+  - `1, 3-4, 7`
+- The Generate Replies prompt is built by `buildGenerateRepliesPrompt(letters)` and includes examples, edge cases, and a validation checklist to keep output consistent.
 - The response is merged back into forms by `letter_id`.
 
 ### Print mode
@@ -125,6 +138,23 @@ No DB/auth/persistence. Data is session-local.
 ---
 
 ## Operational Notes
+
+### Gemini model configuration
+
+Gemini models are configured separately by workflow:
+
+```text
+GEMINI_DETECT_PDF_MODEL=gemini-2.5-flash
+GEMINI_GENERATE_REPLIES_MODEL=gemini-2.5-flash
+```
+
+`GEMINI_MODEL` remains supported as a fallback if a workflow-specific variable is missing. If neither is set, `lib/gemini.ts` falls back to the built-in default model.
+
+### Gemini debug logging
+
+`lib/gemini.ts` currently logs the full `generateContent` request body before calling Gemini. This includes the full base64 PDF and prompt, so logs can be large and may contain sensitive document data.
+
+`app/api/generate-replies/route.ts` also logs the final constructed Generate Replies prompt text.
 
 ### Dev/build artifact isolation (critical)
 
@@ -167,5 +197,9 @@ Completed refactors in this phase:
 6. Changed print typography fallback from Arial to Times.
 7. Added dev/build artifact isolation in `next.config.ts`.
 8. Removed the legacy one-letter generation endpoint; generation is bulk-only through `/api/generate-replies`.
+9. Split Gemini model configuration into Detect PDF and Generate Replies env vars.
+10. Added server-side Gemini request/prompt logging for debugging.
+11. Reordered the letter form text fields to Inquiry, Note, Prayer sentence.
+12. Expanded the Generate Replies prompt into a structured XML-style prompt with examples and validation rules.
 
 The app is currently in a stable, extensible state aligned with these changes.

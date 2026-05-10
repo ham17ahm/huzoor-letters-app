@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { generateWithGeminiPdf } from '@/lib/gemini';
+import { generateWithGeminiPdf, getDetectPdfModel } from '@/lib/gemini';
 import { parseJsonFromText } from '@/lib/json';
 import { buildAnalyzePdfPrompt } from '@/lib/prompts';
 import { normalizeBoundaries } from '@/lib/validators';
@@ -26,6 +26,7 @@ export async function POST(request: Request) {
     const rawText = await generateWithGeminiPdf({
       pdfBase64,
       prompt: buildAnalyzePdfPrompt(),
+      model: getDetectPdfModel(),
       signal: request.signal
     });
 

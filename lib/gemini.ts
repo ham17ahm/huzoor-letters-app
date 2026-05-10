@@ -1,16 +1,49 @@
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
+const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
+
+export function getDetectPdfModel(): string {
+  return process.env.GEMINI_DETECT_PDF_MODEL || process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
+}
+
+export function getGenerateRepliesModel(): string {
+  return process.env.GEMINI_GENERATE_REPLIES_MODEL || process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
+}
 
 export async function generateWithGeminiPdf(params: {
   pdfBase64: string;
   prompt: string;
+  model: string;
   signal?: AbortSignal;
 }): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
-  const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+  const model = params.model;
 
   if (!apiKey) {
     throw new Error('Missing GEMINI_API_KEY in .env.local');
   }
+
+  const requestBody = {
+    contents: [
+      {
+        role: 'user',
+        parts: [
+          {
+            inline_data: {
+              mime_type: 'application/pdf',
+              data: params.pdfBase64
+            }
+          },
+          { text: params.prompt }
+        ]
+      }
+    ],
+    generationConfig: {
+      mediaResolution: 'MEDIA_RESOLUTION_HIGH',
+      temperature: 0.1
+    }
+  };
+
+  console.log('[Gemini] generateContent request body:', JSON.stringify(requestBody, null, 2));
 
   const response = await fetch(`${GEMINI_BASE_URL}/${model}:generateContent`, {
     method: 'POST',
@@ -19,26 +52,7 @@ export async function generateWithGeminiPdf(params: {
       'x-goog-api-key': apiKey
     },
     signal: params.signal,
-    body: JSON.stringify({
-      contents: [
-        {
-          role: 'user',
-          parts: [
-            {
-              inline_data: {
-                mime_type: 'application/pdf',
-                data: params.pdfBase64
-              }
-            },
-            { text: params.prompt }
-          ]
-        }
-      ],
-      generationConfig: {
-        mediaResolution: 'MEDIA_RESOLUTION_HIGH',
-        temperature: 0.1
-      }
-    })
+    body: JSON.stringify(requestBody)
   });
 
   const bodyText = await response.text();
