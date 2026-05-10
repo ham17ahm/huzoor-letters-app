@@ -35,6 +35,7 @@ export async function generateWithGeminiPdf(params: {
         }
       ],
       generationConfig: {
+        mediaResolution: 'MEDIA_RESOLUTION_HIGH',
         temperature: 0.1
       }
     })
