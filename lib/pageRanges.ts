@@ -6,7 +6,12 @@ export function parsePageRange(input: string): number[] {
     if (!part) continue;
 
     if (part.includes('-')) {
-      const [startRaw, endRaw] = part.split('-').map((x) => x.trim());
+      const rangeParts = part.split('-').map((x) => x.trim());
+      if (rangeParts.length !== 2) {
+        throw new Error(`Invalid page range: ${part}`);
+      }
+
+      const [startRaw, endRaw] = rangeParts;
       const start = Number(startRaw);
       const end = Number(endRaw);
       if (!Number.isInteger(start) || !Number.isInteger(end) || start < 1 || end < start) {

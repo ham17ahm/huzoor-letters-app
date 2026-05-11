@@ -22,7 +22,6 @@ export async function POST(request: Request) {
 
     const buffer = Buffer.from(await pdf.arrayBuffer());
     const pdfBase64 = buffer.toString('base64');
-    const pdfSessionId = createPdfSession(pdfBase64);
     const rawText = await generateWithGeminiPdf({
       pdfBase64,
       prompt: buildAnalyzePdfPrompt(),
@@ -39,6 +38,7 @@ export async function POST(request: Request) {
       inquiry: '',
       prayer_sentence: ''
     }));
+    const pdfSessionId = createPdfSession(pdfBase64);
 
     return NextResponse.json({ letters, pdfSessionId, rawText });
   } catch (error) {

@@ -57,6 +57,7 @@ export default function Home() {
           <LetterFormList
             letters={workflow.letters}
             selectedIndex={workflow.selectedIndex}
+            disabled={workflow.isBusy}
             onSelectLetter={workflow.setSelectedIndex}
             onLettersChange={workflow.setLetters}
           />

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { generateWithGeminiPdf, getGenerateRepliesModel } from '@/lib/gemini';
+import { generateWithGeminiPdf, getGenerateRepliesModel, shouldLogGeminiRequests } from '@/lib/gemini';
 import { parseJsonFromText } from '@/lib/json';
 import { buildGenerateRepliesPrompt } from '@/lib/prompts';
 import { normalizeBulkReplies } from '@/lib/validators';
@@ -22,7 +22,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing letters payload.' }, { status: 400 });
     }
 
-    const letters = JSON.parse(lettersRaw) as LetterRecord[];
+    let letters: LetterRecord[];
+    try {
+      letters = JSON.parse(lettersRaw) as LetterRecord[];
+    } catch {
+      return NextResponse.json({ error: 'Invalid letters payload.' }, { status: 400 });
+    }
 
     if (!Array.isArray(letters) || !letters.length) {
       return NextResponse.json({ error: 'Missing letters to process.' }, { status: 400 });
@@ -34,7 +39,9 @@ export async function POST(request: Request) {
     }
 
     const prompt = buildGenerateRepliesPrompt(letters);
-    console.log('[Gemini][generate-replies] Final constructed prompt:\n', prompt);
+    if (shouldLogGeminiRequests()) {
+      console.log('[Gemini][generate-replies] Final constructed prompt:\n', prompt);
+    }
 
     const pdfBase64 = getPdfSession(pdfSessionId);
     const rawText = await generateWithGeminiPdf({

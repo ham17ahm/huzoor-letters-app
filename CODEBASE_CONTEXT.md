@@ -65,7 +65,7 @@ No DB/auth/persistence. Data is session-local.
   - Makes one Gemini call for all requested letters.
   - Returns reply records keyed by `letter_id`.
   - Uses `getGenerateRepliesModel()` so reply generation can run on its own Gemini model.
-  - Logs the final constructed prompt text before calling Gemini.
+  - Can log the final constructed prompt text when `DEBUG_GEMINI_REQUESTS=true`.
 
 - `app/api/clear-pdf/route.ts`
   - Best-effort cleanup of temporary PDF session.
@@ -152,9 +152,9 @@ GEMINI_GENERATE_REPLIES_MODEL=gemini-2.5-flash
 
 ### Gemini debug logging
 
-`lib/gemini.ts` currently logs the full `generateContent` request body before calling Gemini. This includes the full base64 PDF and prompt, so logs can be large and may contain sensitive document data.
+Gemini request logging is gated by `DEBUG_GEMINI_REQUESTS=true`.
 
-`app/api/generate-replies/route.ts` also logs the final constructed Generate Replies prompt text.
+When enabled, `lib/gemini.ts` logs the full `generateContent` request body before calling Gemini. This includes the full base64 PDF and prompt, so logs can be large and may contain sensitive document data. `app/api/generate-replies/route.ts` also logs the final constructed Generate Replies prompt text.
 
 ### Dev/build artifact isolation (critical)
 
@@ -181,8 +181,8 @@ npm run dev
 
 - No database persistence.
 - In-memory PDF sessions only (not multi-instance durable).
-- No automated tests yet.
-- `npm run lint`, `npm run typecheck`, and `npm run build` are the current verification commands.
+- Focused pure-logic tests cover page ranges, letter list operations, print note rules, and phrase insertion.
+- `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build` are the current verification commands.
 
 ---
 
@@ -198,7 +198,7 @@ Completed refactors in this phase:
 7. Added dev/build artifact isolation in `next.config.ts`.
 8. Removed the legacy one-letter generation endpoint; generation is bulk-only through `/api/generate-replies`.
 9. Split Gemini model configuration into Detect PDF and Generate Replies env vars.
-10. Added server-side Gemini request/prompt logging for debugging.
+10. Added server-side Gemini request/prompt logging for debugging, now gated behind `DEBUG_GEMINI_REQUESTS=true`.
 11. Reordered the letter form text fields to Inquiry, Note, Prayer sentence.
 12. Expanded the Generate Replies prompt into a structured XML-style prompt with examples and validation rules.
 

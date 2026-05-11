@@ -51,7 +51,18 @@ export function clearPdfSessionRequest(pdfSessionId: string | null): Promise<voi
 }
 
 async function parseApiResponse<T>(response: Response, fallbackMessage: string): Promise<T> {
-  const data = (await response.json()) as Partial<T> & ApiError;
+  const bodyText = await response.text();
+  let data: Partial<T> & ApiError = {};
+
+  if (bodyText) {
+    try {
+      data = JSON.parse(bodyText) as Partial<T> & ApiError;
+    } catch {
+      if (!response.ok) throw new Error(fallbackMessage);
+      throw new Error('The server returned an invalid response.');
+    }
+  }
+
   if (!response.ok) throw new Error(data.error || fallbackMessage);
   return data as T;
 }

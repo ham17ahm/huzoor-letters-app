@@ -9,6 +9,10 @@ export function getGenerateRepliesModel(): string {
   return process.env.GEMINI_GENERATE_REPLIES_MODEL || process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
 }
 
+export function shouldLogGeminiRequests(): boolean {
+  return process.env.DEBUG_GEMINI_REQUESTS === 'true';
+}
+
 export async function generateWithGeminiPdf(params: {
   pdfBase64: string;
   prompt: string;
@@ -43,7 +47,9 @@ export async function generateWithGeminiPdf(params: {
     }
   };
 
-  console.log('[Gemini] generateContent request body:', JSON.stringify(requestBody, null, 2));
+  if (shouldLogGeminiRequests()) {
+    console.log('[Gemini] generateContent request body:', JSON.stringify(requestBody, null, 2));
+  }
 
   const response = await fetch(`${GEMINI_BASE_URL}/${model}:generateContent`, {
     method: 'POST',

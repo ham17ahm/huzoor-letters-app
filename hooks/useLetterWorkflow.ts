@@ -88,9 +88,9 @@ export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): Workf
   }
 
   function finishOperation(signal: AbortSignal) {
-    if (activeRequestRef.current?.signal === signal) {
-      activeRequestRef.current = null;
-    }
+    if (activeRequestRef.current?.signal !== signal) return;
+
+    activeRequestRef.current = null;
     busyRef.current = false;
     setState((current) => ({ ...current, busyLabel: null }));
   }
@@ -272,7 +272,12 @@ export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): Workf
 }
 
 function isAbortError(error: unknown): boolean {
-  return error instanceof DOMException && error.name === 'AbortError';
+  return Boolean(
+    error &&
+      typeof error === 'object' &&
+      'name' in error &&
+      (error as { name?: unknown }).name === 'AbortError'
+  );
 }
 
 function resolveSelectedIndex(index: number, letterCount: number): number {

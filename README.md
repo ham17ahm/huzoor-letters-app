@@ -53,6 +53,7 @@ The font file is not included. If you have the font, place it at that path. The 
 GEMINI_API_KEY=...
 GEMINI_DETECT_PDF_MODEL=gemini-2.5-flash
 GEMINI_GENERATE_REPLIES_MODEL=gemini-2.5-flash
+DEBUG_GEMINI_REQUESTS=false
 ```
 
 `GEMINI_MODEL` is still supported as a fallback if either workflow-specific model is not set.
@@ -69,8 +70,8 @@ Model selection is intentionally route-specific:
 - Generate Replies builds its prompt in `buildGenerateRepliesPrompt` using each letter's `letter_id`, formatted `source_pages`, and user-entered `note`.
 - The Generate Replies prompt is structured with XML-style sections such as role, task, requested letters, note handling, field specifications, examples, edge cases, validation checklist, and output format.
 - `source_pages` is formatted by `formatPageRange` as strings like `5`, `1-3`, or `1, 3-4, 7`.
-- Server logs currently print the constructed Gemini request body in `lib/gemini.ts`; this includes the full PDF base64 and can be very large.
-- The Generate Replies route also logs the final constructed prompt text before calling Gemini.
+- Gemini request and prompt logging is off by default. Set `DEBUG_GEMINI_REQUESTS=true` to log the constructed request body and Generate Replies prompt while debugging.
+- When enabled, Gemini request logging includes the full PDF base64 and can be very large.
 
 ## Important v1 limitations
 

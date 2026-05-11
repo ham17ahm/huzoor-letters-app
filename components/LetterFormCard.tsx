@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { INQUIRY_PHRASE_BUTTONS } from '@/lib/inquiryPhraseButtons';
+import { appendPhrase } from '@/lib/textInsertion';
 import type { LetterRecord } from '@/types/letter';
 import { formatPageRange, parsePageRange } from '@/lib/pageRanges';
 
@@ -9,6 +10,7 @@ type Props = {
   letter: LetterRecord;
   index: number;
   total: number;
+  disabled?: boolean;
   onChange: (updated: LetterRecord) => void;
   onMergePrevious: () => void;
   onMergeNext: () => void;
@@ -19,6 +21,7 @@ export function LetterFormCard({
   letter,
   index,
   total,
+  disabled,
   onChange,
   onMergePrevious,
   onMergeNext,
@@ -61,6 +64,7 @@ export function LetterFormCard({
             value={pagesInput}
             aria-label={`Source pages for ${letter.letter_id}`}
             aria-invalid={Boolean(pagesError)}
+            disabled={disabled}
             onChange={(event) => {
               setPagesInput(event.target.value);
               if (pagesError) setPagesError(null);
@@ -71,13 +75,21 @@ export function LetterFormCard({
           {pagesError ? <div className="fieldError">{pagesError}</div> : null}
         </div>
         <div className="cardActions">
-          <button onClick={onMergePrevious} disabled={index === 0} title="Merge this letter into the previous one">
+          <button
+            onClick={onMergePrevious}
+            disabled={disabled || index === 0}
+            title="Merge this letter into the previous one"
+          >
             Merge previous
           </button>
-          <button onClick={onMergeNext} disabled={index === total - 1} title="Merge this letter with the next one">
+          <button
+            onClick={onMergeNext}
+            disabled={disabled || index === total - 1}
+            title="Merge this letter with the next one"
+          >
             Merge next
           </button>
-          <button className="dangerButton" onClick={onRemove} disabled={total <= 1}>
+          <button className="dangerButton" onClick={onRemove} disabled={disabled || total <= 1}>
             Remove
           </button>
         </div>
@@ -89,6 +101,7 @@ export function LetterFormCard({
           <input
             id={`${letter.letter_id}-name`}
             value={letter.full_name}
+            disabled={disabled}
             onChange={(event) => update({ full_name: event.target.value })}
             placeholder="Filled by Gemini"
           />
@@ -99,6 +112,7 @@ export function LetterFormCard({
           <input
             id={`${letter.letter_id}-location`}
             value={letter.location}
+            disabled={disabled}
             onChange={(event) => update({ location: event.target.value })}
             placeholder="City, Country"
           />
@@ -110,6 +124,7 @@ export function LetterFormCard({
             <textarea
               id={`${letter.letter_id}-inquiry`}
               value={letter.inquiry}
+              disabled={disabled}
               onChange={(event) => update({ inquiry: event.target.value })}
               placeholder="Filled by Gemini after notes are entered"
             />
@@ -119,6 +134,7 @@ export function LetterFormCard({
                   key={button.id}
                   type="button"
                   className="inquiryPhraseButton"
+                  disabled={disabled}
                   onClick={() => insertInquiryPhrase(button.phrase)}
                   title={button.phrase}
                 >
@@ -136,6 +152,7 @@ export function LetterFormCard({
             className={missingNote ? 'noteRequired' : ''}
             autoFocus
             value={letter.note}
+            disabled={disabled}
             onChange={(event) => update({ note: event.target.value })}
             placeholder="Type exact note here. Use Dua for prayers only."
           />
@@ -146,6 +163,7 @@ export function LetterFormCard({
           <textarea
             id={`${letter.letter_id}-prayer`}
             value={letter.prayer_sentence}
+            disabled={disabled}
             onChange={(event) => update({ prayer_sentence: event.target.value })}
             placeholder="Filled by Gemini after notes are entered"
           />
@@ -153,12 +171,4 @@ export function LetterFormCard({
       </div>
     </section>
   );
-}
-
-function appendPhrase(currentText: string, phrase: string): string {
-  const trimmedPhrase = phrase.trim();
-  if (!trimmedPhrase) return currentText;
-  if (!currentText) return trimmedPhrase;
-  if (/\s$/.test(currentText)) return `${currentText}${trimmedPhrase}`;
-  return `${currentText} ${trimmedPhrase}`;
 }

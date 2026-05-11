@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import type { LetterRecord } from '@/types/letter';
 import { formatHmDate } from '@/lib/date';
-import { PRINT_HEADER_LOCATION } from '@/lib/printConfig';
+import { PRINT_HEADER_LOCATION, PRINT_TEMPLATE_TEXT, shouldPrintNote } from '@/lib/printConfig';
 import styles from './PrintPreview.module.css';
 
 type Props = {
@@ -26,11 +26,11 @@ export function PrintPreview({ letters, onClose }: Props) {
         </div>
         <div className={styles.toolbarControls}>
           <label htmlFor="print-date" style={{ margin: 0, fontWeight: 600 }}>
-            Date
+            {PRINT_TEMPLATE_TEXT.dateLabel}
           </label>
           <input id="print-date" value={hmDate} onChange={(event) => setHmDate(event.target.value)} />
-          <button onClick={() => window.print()}>Print</button>
-          <button onClick={onClose}>Close</button>
+          <button onClick={() => window.print()}>{PRINT_TEMPLATE_TEXT.printButtonLabel}</button>
+          <button onClick={onClose}>{PRINT_TEMPLATE_TEXT.closeButtonLabel}</button>
         </div>
       </div>
 
@@ -43,31 +43,35 @@ export function PrintPreview({ letters, onClose }: Props) {
             </div>
 
             <div className={`${styles.titleFullName} ${styles.text}`}>
-              <div className={`${styles.title} ${styles.text}`}>Dear&nbsp;</div>
-              <div className={`${styles.fullName} ${styles.text}`}>{letter.full_name || 'N/A'},</div>
+              <div className={`${styles.title} ${styles.text}`}>{PRINT_TEMPLATE_TEXT.salutationPrefix}&nbsp;</div>
+              <div className={`${styles.fullName} ${styles.text}`}>
+                {letter.full_name || PRINT_TEMPLATE_TEXT.fallbackValue},
+              </div>
             </div>
 
-            <div className={styles.salam}>اَلسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُه</div>
+            <div className={styles.salam}>{PRINT_TEMPLATE_TEXT.salam}</div>
 
-            <div className={`${styles.introText} ${styles.text}`}>{letter.inquiry || 'I have received your letter.'}</div>
+            <div className={`${styles.introText} ${styles.text}`}>
+              {letter.inquiry || PRINT_TEMPLATE_TEXT.defaultInquiry}
+            </div>
 
-            {letter.note.trim().toLowerCase() !== 'dua' && letter.note.trim() ? (
+            {shouldPrintNote(letter.note) ? (
               <div className={`${styles.noteText} ${styles.text}`}>{letter.note}</div>
             ) : null}
 
             <div className={`${styles.mainText} ${styles.text}`} style={{ lineHeight: 1.2 }}>
-              <p>{letter.prayer_sentence || 'May Allah Taala bless you in every way. Amin'}</p>
+              <p>{letter.prayer_sentence || PRINT_TEMPLATE_TEXT.defaultPrayer}</p>
             </div>
 
-            <div className={styles.wassalam}>Wassalam</div>
-            <div className={styles.greetingEnd}>Yours sincerely,</div>
-            <div className={styles.signature}>MIRZA MASROOR AHMAD</div>
-            <div className={styles.signatureTitle}>Khalifatul-Masih V</div>
+            <div className={styles.wassalam}>{PRINT_TEMPLATE_TEXT.wassalam}</div>
+            <div className={styles.greetingEnd}>{PRINT_TEMPLATE_TEXT.closing}</div>
+            <div className={styles.signature}>{PRINT_TEMPLATE_TEXT.signature}</div>
+            <div className={styles.signatureTitle}>{PRINT_TEMPLATE_TEXT.signatureTitle}</div>
           </div>
 
           <div className={styles.footnoteContainer}>
             <div></div>
-            <div className={styles.footerLocation}>{letter.location || 'N/A'}</div>
+            <div className={styles.footerLocation}>{letter.location || PRINT_TEMPLATE_TEXT.fallbackValue}</div>
           </div>
         </article>
       ))}

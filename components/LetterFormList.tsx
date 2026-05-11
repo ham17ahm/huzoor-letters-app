@@ -3,16 +3,29 @@
 import { LetterFormCard } from '@/components/LetterFormCard';
 import { LetterPagination } from '@/components/LetterPagination';
 import { LetterSidebar } from '@/components/LetterSidebar';
+import {
+  mergeLetterAt,
+  removeLetterAt,
+  resolveSelectedIndex,
+  setLetterAt
+} from '@/lib/letterListOperations';
 import type { LetterRecord } from '@/types/letter';
 
 type Props = {
   letters: LetterRecord[];
   selectedIndex: number;
+  disabled?: boolean;
   onSelectLetter: (index: number) => void;
   onLettersChange: (letters: LetterRecord[], options?: { nextSelectedIndex?: number }) => void;
 };
 
-export function LetterFormList({ letters, selectedIndex, onSelectLetter, onLettersChange }: Props) {
+export function LetterFormList({
+  letters,
+  selectedIndex,
+  disabled,
+  onSelectLetter,
+  onLettersChange
+}: Props) {
   if (!letters.length) {
     return (
       <div className="emptyState">
@@ -22,43 +35,23 @@ export function LetterFormList({ letters, selectedIndex, onSelectLetter, onLette
     );
   }
 
-  const activeIndex = resolveIndex(selectedIndex, letters.length);
+  const activeIndex = resolveSelectedIndex(selectedIndex, letters.length);
   const selectedLetter = letters[activeIndex];
 
   function setLetter(index: number, updated: LetterRecord) {
-    const next = [...letters];
-    next[index] = updated;
-    onLettersChange(resequence(next), { nextSelectedIndex: index });
+    const change = setLetterAt(letters, index, updated);
+    onLettersChange(change.letters, { nextSelectedIndex: change.selectedIndex });
   }
 
   function mergeAt(index: number, direction: 'previous' | 'next') {
-    const targetIndex = direction === 'previous' ? index - 1 : index;
-    const nextIndex = targetIndex + 1;
-    if (targetIndex < 0 || nextIndex >= letters.length) return;
-
-    const mergedPages = Array.from(
-      new Set([...letters[targetIndex].source_pages, ...letters[nextIndex].source_pages])
-    ).sort((a, b) => a - b);
-
-    const merged: LetterRecord = {
-      ...letters[targetIndex],
-      source_pages: mergedPages,
-      note: combineText(letters[targetIndex].note, letters[nextIndex].note),
-      full_name: letters[targetIndex].full_name || letters[nextIndex].full_name,
-      location: letters[targetIndex].location || letters[nextIndex].location,
-      inquiry: letters[targetIndex].inquiry || letters[nextIndex].inquiry,
-      prayer_sentence: letters[targetIndex].prayer_sentence || letters[nextIndex].prayer_sentence
-    };
-
-    const next = [...letters];
-    next.splice(targetIndex, 2, merged);
-    onLettersChange(resequence(next), { nextSelectedIndex: targetIndex });
+    const change = mergeLetterAt(letters, index, direction);
+    if (!change) return;
+    onLettersChange(change.letters, { nextSelectedIndex: change.selectedIndex });
   }
 
   function removeAt(index: number) {
-    const next = letters.filter((_, i) => i !== index);
-    const nextSelectedIndex = Math.min(index, Math.max(next.length - 1, 0));
-    onLettersChange(resequence(next), { nextSelectedIndex });
+    const change = removeLetterAt(letters, index);
+    onLettersChange(change.letters, { nextSelectedIndex: change.selectedIndex });
   }
 
   return (
@@ -82,6 +75,7 @@ export function LetterFormList({ letters, selectedIndex, onSelectLetter, onLette
           letter={selectedLetter}
           index={activeIndex}
           total={letters.length}
+          disabled={disabled}
           onChange={(updated) => setLetter(activeIndex, updated)}
           onMergePrevious={() => mergeAt(activeIndex, 'previous')}
           onMergeNext={() => mergeAt(activeIndex, 'next')}
@@ -90,25 +84,4 @@ export function LetterFormList({ letters, selectedIndex, onSelectLetter, onLette
       </div>
     </div>
   );
-}
-
-function resolveIndex(index: number, length: number): number {
-  if (length <= 0) return 0;
-  if (index < 0) return 0;
-  if (index >= length) return length - 1;
-  return index;
-}
-
-function resequence(letters: LetterRecord[]): LetterRecord[] {
-  return letters.map((letter, index) => ({
-    ...letter,
-    letter_id: `L${String(index + 1).padStart(3, '0')}`
-  }));
-}
-
-function combineText(a: string, b: string): string {
-  const first = a.trim();
-  const second = b.trim();
-  if (first && second && first !== second) return `${first}\n${second}`;
-  return first || second;
 }
