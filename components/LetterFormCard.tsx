@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { INQUIRY_PHRASE_BUTTONS } from '@/lib/inquiryPhraseButtons';
 import type { LetterRecord } from '@/types/letter';
 import { formatPageRange, parsePageRange } from '@/lib/pageRanges';
 
@@ -42,6 +43,10 @@ export function LetterFormCard({
     } catch (error) {
       setPagesError(error instanceof Error ? error.message : 'Invalid page range.');
     }
+  }
+
+  function insertInquiryPhrase(phrase: string) {
+    update({ inquiry: appendPhrase(letter.inquiry, phrase) });
   }
 
   return (
@@ -101,12 +106,27 @@ export function LetterFormCard({
 
         <div className="fieldFull">
           <label htmlFor={`${letter.letter_id}-inquiry`}>Inquiry</label>
-          <textarea
-            id={`${letter.letter_id}-inquiry`}
-            value={letter.inquiry}
-            onChange={(event) => update({ inquiry: event.target.value })}
-            placeholder="Filled by Gemini after notes are entered"
-          />
+          <div className="inquiryComposer">
+            <textarea
+              id={`${letter.letter_id}-inquiry`}
+              value={letter.inquiry}
+              onChange={(event) => update({ inquiry: event.target.value })}
+              placeholder="Filled by Gemini after notes are entered"
+            />
+            <div className="inquiryPhraseButtons" aria-label="Insert inquiry phrases">
+              {INQUIRY_PHRASE_BUTTONS.map((button) => (
+                <button
+                  key={button.id}
+                  type="button"
+                  className="inquiryPhraseButton"
+                  onClick={() => insertInquiryPhrase(button.phrase)}
+                  title={button.phrase}
+                >
+                  {button.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="fieldFull">
@@ -133,4 +153,12 @@ export function LetterFormCard({
       </div>
     </section>
   );
+}
+
+function appendPhrase(currentText: string, phrase: string): string {
+  const trimmedPhrase = phrase.trim();
+  if (!trimmedPhrase) return currentText;
+  if (!currentText) return trimmedPhrase;
+  if (/\s$/.test(currentText)) return `${currentText}${trimmedPhrase}`;
+  return `${currentText} ${trimmedPhrase}`;
 }
