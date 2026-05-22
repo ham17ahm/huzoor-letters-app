@@ -20,4 +20,9 @@ export const INQUIRY_PHRASE_BUTTONS: InquiryPhraseButton[] = [
     label: "Condolences",
     phrase: "Kindly accept my heartfelt condolences on this loss.",
   },
+  {
+    id: "innalillah",
+    label: "Inna Lillah",
+    phrase: "اِنَّا لِلّٰہِ وَاِنَّاۤ اِلَیۡہِ رٰجِعُوۡنَ",
+  },
 ];
