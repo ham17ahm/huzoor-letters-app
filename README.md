@@ -101,6 +101,9 @@ Model selection is intentionally route-specific:
 - `lib/toolbarConfig.ts`
   - Declarative toolbar action list (labels/order/variants).
   - To add a new button, define it here and wire behavior in `app/page.tsx`.
+- `lib/inquiryPhraseButtons.ts`
+  - Declarative list of small buttons that insert preset text into the Inquiry textarea.
+  - Add or amend Inquiry phrase buttons here; `LetterFormCard.tsx` renders the list automatically.
 - `app/page.tsx`
   - Thin composition layer that binds the workflow hook to presentational components.
 - `components/*`

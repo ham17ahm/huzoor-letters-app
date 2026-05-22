@@ -97,8 +97,9 @@ No DB/auth/persistence. Data is session-local.
 - Jump-to-letter by sidebar click.
 - Main editable text fields are ordered as:
   - Inquiry
-  - Note
-  - Prayer sentence
+  - Note and Prayer sentence side by side, each occupying one half of the form grid
+- Textarea default height is controlled globally in `app/globals.css` by the base `textarea` rule. It is currently `min-height: 120px`.
+- Inquiry phrase buttons are rendered from `lib/inquiryPhraseButtons.ts` and displayed in a 2-column grid so six buttons fit as three rows.
 
 ### Generation mode
 
@@ -135,6 +136,21 @@ No DB/auth/persistence. Data is session-local.
 - Example processors in `lib/letterProcessorExamples.ts`.
 - Hook supports custom injection via:
   - `useLetterWorkflow({ processors: [...] })`
+
+### 3) Inquiry phrase buttons
+
+- `lib/inquiryPhraseButtons.ts`
+- Add, remove, rename, or change inserted Inquiry phrases in this single file.
+- `LetterFormCard.tsx` maps over `INQUIRY_PHRASE_BUTTONS`, so new entries render automatically.
+- Button layout is controlled by `.inquiryPhraseButtons` and `.inquiryPhraseButton` in `app/globals.css`.
+
+### 4) AI model config
+
+- `lib/aiModelConfig.ts`
+- Master file for default Gemini models used by:
+  - Detect PDF
+  - Generate Replies
+- Environment variables still override the defaults.
 
 ---
 
@@ -202,5 +218,9 @@ Completed refactors in this phase:
 10. Added server-side Gemini request/prompt logging for debugging, now gated behind `DEBUG_GEMINI_REQUESTS=true`.
 11. Reordered the letter form text fields to Inquiry, Note, Prayer sentence.
 12. Expanded the Generate Replies prompt into a structured XML-style prompt with examples and validation rules.
+13. Added `lib/aiModelConfig.ts` as the master AI model config file for Detect PDF and Generate Replies.
+14. Changed Note and Prayer sentence textareas to sit side by side in the existing two-column form grid.
+15. Increased the global textarea `min-height` to `120px`.
+16. Changed Inquiry phrase buttons to a two-column grid so more buttons can fit without expanding the panel as much.
 
 The app is currently in a stable, extensible state aligned with these changes.
