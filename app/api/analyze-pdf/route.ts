@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { generateWithGeminiPdf, getDetectPdfModel } from '@/lib/gemini';
+import { getDetectPdfModel } from '@/lib/aiModelConfig';
+import { generateWithGeminiPdf } from '@/lib/gemini';
 import { parseJsonFromText } from '@/lib/json';
 import { buildAnalyzePdfPrompt } from '@/lib/prompts';
 import { normalizeBoundaries } from '@/lib/validators';

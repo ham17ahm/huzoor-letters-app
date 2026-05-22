@@ -1,13 +1,4 @@
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
-const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
-
-export function getDetectPdfModel(): string {
-  return process.env.GEMINI_DETECT_PDF_MODEL || process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
-}
-
-export function getGenerateRepliesModel(): string {
-  return process.env.GEMINI_GENERATE_REPLIES_MODEL || process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
-}
 
 export function shouldLogGeminiRequests(): boolean {
   return process.env.DEBUG_GEMINI_REQUESTS === 'true';

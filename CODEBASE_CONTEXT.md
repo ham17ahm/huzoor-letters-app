@@ -72,7 +72,8 @@ No DB/auth/persistence. Data is session-local.
 
 ### Domain/Utility Layer
 
-- `lib/gemini.ts` — Gemini call implementation and workflow-specific model selectors.
+- `lib/aiModelConfig.ts` — master AI model config and workflow-specific model selectors.
+- `lib/gemini.ts` — Gemini call implementation.
 - `lib/prompts.ts` — boundary + reply prompt builders.
   - Generate Replies prompt uses XML-style sections for role, task, requested letters, note handling, field specifications, examples, edge cases, validation checklist, and output format.
 - `lib/validators.ts` — normalization of Gemini output.
@@ -148,7 +149,7 @@ GEMINI_DETECT_PDF_MODEL=gemini-2.5-flash
 GEMINI_GENERATE_REPLIES_MODEL=gemini-2.5-flash
 ```
 
-`GEMINI_MODEL` remains supported as a fallback if a workflow-specific variable is missing. If neither is set, `lib/gemini.ts` falls back to the built-in default model.
+`GEMINI_MODEL` remains supported as a fallback if a workflow-specific variable is missing. If neither is set, `lib/aiModelConfig.ts` falls back to the built-in default model.
 
 ### Gemini debug logging
 

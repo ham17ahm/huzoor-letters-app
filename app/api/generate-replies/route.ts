@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { generateWithGeminiPdf, getGenerateRepliesModel, shouldLogGeminiRequests } from '@/lib/gemini';
+import { getGenerateRepliesModel } from '@/lib/aiModelConfig';
+import { generateWithGeminiPdf, shouldLogGeminiRequests } from '@/lib/gemini';
 import { parseJsonFromText } from '@/lib/json';
 import { buildGenerateRepliesPrompt } from '@/lib/prompts';
 import { normalizeBulkReplies } from '@/lib/validators';

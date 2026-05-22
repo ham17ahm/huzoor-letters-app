@@ -145,7 +145,7 @@ export function LetterFormCard({
           </div>
         </div>
 
-        <div className="fieldFull">
+        <div>
           <label htmlFor={`${letter.letter_id}-note`}>Note {missingNote ? '(required)' : ''}</label>
           <textarea
             id={`${letter.letter_id}-note`}
@@ -158,7 +158,7 @@ export function LetterFormCard({
           />
         </div>
 
-        <div className="fieldFull">
+        <div>
           <label htmlFor={`${letter.letter_id}-prayer`}>Prayer sentence</label>
           <textarea
             id={`${letter.letter_id}-prayer`}

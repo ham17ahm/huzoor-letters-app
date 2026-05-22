@@ -92,7 +92,9 @@ Model selection is intentionally route-specific:
 - `lib/gemini.ts`
   - Shared Gemini request helper.
   - Accepts the selected model explicitly from each route.
-  - Exposes `getDetectPdfModel()` and `getGenerateRepliesModel()` for simple workflow-specific model configuration.
+- `lib/aiModelConfig.ts`
+  - Master AI model config for Detect PDF and Generate Replies.
+  - Exposes `getDetectPdfModel()` and `getGenerateRepliesModel()` with environment variable overrides.
 - `lib/letterProcessors.ts`
   - Per-letter plugin pipeline for generation with `beforeGenerate` and `afterGenerate` hooks.
   - Use this for feature additions that need letter-level transformations or policies.

@@ -1,6 +1,6 @@
 @font-face {
   font-family: Khat_Manzoor;
-  src: url('/fonts/_Khat_Manzoor.ttf');
+  src: url("/fonts/_Khat_Manzoor.ttf");
 }
 
 :root {
@@ -77,7 +77,7 @@ textarea {
 }
 
 textarea {
-  min-height: 76px;
+  min-height: 120px;
   resize: vertical;
   line-height: 1.4;
 }
@@ -302,7 +302,7 @@ label {
   border-radius: 16px;
   padding: 14px;
   margin-bottom: 14px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .letterCardHeader {
@@ -390,7 +390,7 @@ label {
   margin-top: 6px;
 }
 
-input[aria-invalid='true'] {
+input[aria-invalid="true"] {
   border-color: var(--danger);
   background: var(--danger-soft);
 }
