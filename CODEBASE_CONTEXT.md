@@ -151,15 +151,18 @@ Generate Replies → review → print), with two amendments:
   - `components/Toolbar.tsx` (+ `.routeNav` styles in `globals.css`) — the `[Standard] [PS]`
     cross-link nav, active route highlighted via `usePathname`.
 - **PS-specific files (the fork):**
-  - `app/ps/page.tsx`, `app/ps/print/page.tsx`, `app/ps/print/PsPrintPageClient.tsx`
+  - `app/ps/page.tsx`
   - `app/api/ps/analyze-pdf/route.ts`, `app/api/ps/generate-replies/route.ts`
     (no missing-note check)
   - `hooks/usePsLetterWorkflow.ts` (note gating + `preserve-manual-note` processor removed)
-  - `components/ps/PsLetterFormCard.tsx`, `PsLetterFormList.tsx`, `PsLetterSidebar.tsx`,
-    `PsPrintPreview.tsx`
+  - `components/ps/PsLetterFormCard.tsx`, `PsLetterFormList.tsx`, `PsLetterSidebar.tsx`
   - `lib/ps/prompts.ts`, `lib/ps/apiClient.ts`, `lib/ps/letterListOperations.ts`
-    (note merging removed), `lib/ps/printPreviewSession.ts` (distinct storage key
-    `huzoor-ps-print-preview:`, opens `/ps/print`)
+    (note merging removed)
+  - `lib/ps/printDocument.ts` — PS print uses a **different letterhead** (Private Secretary
+    template). `openPsPrintPreview(letters)` opens a popup and `document.write`s a full,
+    self-contained HTML/CSS document (no `/ps/print` route, no `localStorage` hand-off). It
+    maps `full_name`/`inquiry`/`prayer_sentence`/`location` and needs `public/` assets:
+    `/fonts/Adobe Naskh Medium.ttf` (Kufi) and `/img/SignPS_English.png` (signature).
   - `types/ps.ts` (`PsLetterRecord = Omit<LetterRecord, 'note'>` + response types)
   - `tests/psLetterListOperations.test.ts`
 
@@ -274,5 +277,6 @@ Completed refactors in this phase:
 15. Increased the global textarea `min-height` to `120px`.
 16. Changed Inquiry phrase buttons to a two-column grid so more buttons can fit without expanding the panel as much.
 17. Added an isolated, note-free `/ps` route (clone of the app) with its own pages, API routes, hook, components, prompts (refactored into section constants), print hand-off, and types. Shared pure utilities are reused; only `lib/aiModelConfig.ts` and `components/Toolbar.tsx` were touched additively. A `[Standard] [PS]` cross-link nav was added to the shared header. See "PS Route" above.
+18. Replaced the PS print with a distinct Private Secretary letterhead template (`lib/ps/printDocument.ts`, `openPsPrintPreview`) that opens a popup and writes a self-contained HTML/CSS document. Removed the earlier route-based PS print (`app/ps/print/*`, `components/ps/PsPrintPreview.tsx`, `lib/ps/printPreviewSession.ts`). New `public/` assets are required: `/fonts/Adobe Naskh Medium.ttf` and `/img/SignPS_English.png`.
 
 The app is currently in a stable, extensible state aligned with these changes.

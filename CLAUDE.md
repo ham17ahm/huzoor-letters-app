@@ -50,8 +50,12 @@ in an in-memory `pdfSession`, 2h TTL) → [enter notes — `/` only] → **Gener
   merge/remove/edit. Don't treat it as stable.
 - `/` requires a non-empty note before generation (guarded client- and server-side); `/ps` has
   no such gate.
-- PS print uses a **distinct** `localStorage` key (`huzoor-ps-print-preview:`) so the two
-  routes' print hand-offs never collide.
+- Print differs by route. `/` uses a `/print` route + `localStorage` hand-off
+  (`lib/printPreviewSession.ts`, `components/PrintPreview*`). `/ps` uses a self-contained
+  letterhead template in `lib/ps/printDocument.ts` (`openPsPrintPreview`) that opens a popup
+  and `document.write`s its own full HTML/CSS document — there is no `/ps/print` route. The PS
+  template needs assets in `public/`: `/fonts/Adobe Naskh Medium.ttf` (Kufi) and
+  `/img/SignPS_English.png` (signature); `/fonts/_Khat_Manzoor.ttf` already exists.
 - `next.config.ts` deliberately splits dev (`.next/dev`) vs build (`.next`) output. Running
   `npm run build` rewrites `next-env.d.ts` to point at `.next/types`; `npm run dev` flips it
   back. Don't commit that flip.

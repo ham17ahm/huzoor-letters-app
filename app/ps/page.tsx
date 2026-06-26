@@ -4,7 +4,7 @@ import { PsLetterFormList } from '@/components/ps/PsLetterFormList';
 import { PdfViewer } from '@/components/PdfViewer';
 import { Toolbar } from '@/components/Toolbar';
 import { usePsLetterWorkflow } from '@/hooks/usePsLetterWorkflow';
-import { openPrintPreviewTab } from '@/lib/ps/printPreviewSession';
+import { openPsPrintPreview } from '@/lib/ps/printDocument';
 import { TOOLBAR_ACTIONS } from '@/lib/toolbarConfig';
 import type { ToolbarAction, ToolbarActionId } from '@/types/toolbar';
 
@@ -21,7 +21,7 @@ export default function PsHome() {
   const handlerById: Record<ToolbarActionId, () => void> = {
     analyze: () => void workflow.analyzePdf(),
     generate: () => void workflow.generateReplies(),
-    print: () => openPrintPreviewTab(workflow.letters),
+    print: () => openPsPrintPreview(workflow.letters),
     reset: workflow.resetAll
   };
 

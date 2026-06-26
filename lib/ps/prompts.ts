@@ -124,7 +124,7 @@ Process ALL requested letters below. For each item:
     - Financial difficulties: include removal of hardship, abundant sustenance, and patience.
 
     General requirements:
-    - Directly relate the prayer to the specific situation described in the letter.
+    - Relate the prayer to the specific situation described in the letter in a generic way.
     - Address both the immediate concern and broader blessings.
     - Maintain a warm, compassionate, and respectful tone throughout.
   </field>
@@ -142,8 +142,8 @@ Process ALL requested letters below. For each item:
         "letter_id": "L001",
         "full_name": "Ahmad Hassan",
         "location": "Toronto, Canada",
-        "inquiry": "Huzoor Anwar (may Allah be his Helper) has received your letter requesting guidance regarding your wife's treatment who is undergoing some pregnancy complications. Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers.",
-        "prayer_sentence": "May Allah Taala grant your wife an easy and safe delivery and bless you and your family with a healthy and righteous child who becomes a source of comfort for you all. May Allah always be with you and keep you in His care. Amin"
+        "inquiry": "Huzoor Anwar (may Allah be his Helper) has received your letter requesting prayers regarding your wife's treatment who is undergoing some pregnancy complications. Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers.",
+        "prayer_sentence": "May Allah Taala grant your wife an easy and safe delivery and bless you and your family with a healthy and righteous child who becomes a source of comfort for you all. May Allah always be with your growing family and keep you in His care. Amin"
       }
     </output>
   </example>
@@ -164,7 +164,7 @@ Before returning your response, verify each letter entry against these checks:
 1. letter_id exactly matches one of the requested letter_ids.
 2. full_name is extracted from the letter or set to "N/A".
 3. location follows the "City, Country" format or is set to "N/A".
-4. inquiry starts with "I have received your letter" and is exactly one sentence.
+4. inquiry starts with "Huzoor Anwar (may Allah be his Helper) has received your letter", follwed by the specific matter from the letter extracted contextually from the content. Followed by: "Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers.".
 5. inquiry focuses on the primary concern of the letter.
 6. prayer_sentence starts with "May Allah Taala" and ends with "Amin".
 7. prayer_sentence directly relates to the inquiry and the letter content.
