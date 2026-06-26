@@ -1,5 +1,5 @@
-import type { PsLetterRecord } from '@/types/ps';
-import { formatPageRange } from '@/lib/pageRanges';
+import type { PsLetterRecord } from "@/types/ps";
+import { formatPageRange } from "@/lib/pageRanges";
 
 /**
  * PS prompt builders.
@@ -47,7 +47,7 @@ Schema:
 - Sort by the first source page ascending.
 - Use sequential letter IDs: L001, L002, L003.
 - If uncertain, prefer the simplest reasonable grouping, but do not split a clearly continuing letter.
-- Every relevant page should appear in exactly one letter record.`
+- Every relevant page should appear in exactly one letter record.`,
 } as const;
 
 export function buildPsAnalyzePdfPrompt(): string {
@@ -55,8 +55,8 @@ export function buildPsAnalyzePdfPrompt(): string {
     ANALYZE_SECTIONS.role,
     ANALYZE_SECTIONS.context,
     ANALYZE_SECTIONS.outputFormat,
-    ANALYZE_SECTIONS.rules
-  ].join('\n\n');
+    ANALYZE_SECTIONS.rules,
+  ].join("\n\n");
 }
 
 // ---------------------------------------------------------------------------
@@ -97,8 +97,8 @@ Process ALL requested letters below. For each item:
   <field name="inquiry">
     A single formal sentence acknowledging the letter and its primary concern.
 
-    Required prefix: "I have received your letter"
-    Format pattern: "I have received your letter [requesting/asking/inquiring about/mentioning] [specific matter from the letter]."
+    Required prefix: "Huzoor Anwar (may Allah be his Helper) has received your letter ... Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers."
+    Format pattern: "Huzoor Anwar (may Allah be his Helper) has received your letter [requesting/asking/inquiring about/mentioning] [specific matter from the letter]. Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers."
 
     Construction rules:
     - Must be exactly one sentence. No compound sentences or multiple clauses.
@@ -142,8 +142,8 @@ Process ALL requested letters below. For each item:
         "letter_id": "L001",
         "full_name": "Ahmad Hassan",
         "location": "Toronto, Canada",
-        "inquiry": "I have received your letter requesting guidance regarding your wife's treatment who is undergoing some pregnancy complications.",
-        "prayer_sentence": "May Allah Taala grant your wife an easy and safe delivery and bless you and your family with a healthy and righteous child who becomes a source of comfort for you all. Amin"
+        "inquiry": "Huzoor Anwar (may Allah be his Helper) has received your letter requesting guidance regarding your wife's treatment who is undergoing some pregnancy complications. Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers.",
+        "prayer_sentence": "May Allah Taala grant your wife an easy and safe delivery and bless you and your family with a healthy and righteous child who becomes a source of comfort for you all. May Allah always be with you and keep you in His care. Amin"
       }
     </output>
   </example>
@@ -187,13 +187,13 @@ Schema:
   }
 ]
 Return exactly one object per requested letter_id, sorted by letter_id.
-</output_format>`
+</output_format>`,
 } as const;
 
 function buildRequestedLettersSection(letters: PsLetterRecord[]): string {
   const payload = letters.map((letter) => ({
     letter_id: letter.letter_id,
-    source_pages: formatPageRange(letter.source_pages)
+    source_pages: formatPageRange(letter.source_pages),
   }));
 
   return `<requested_letters>
@@ -201,7 +201,9 @@ ${JSON.stringify(payload, null, 2)}
 </requested_letters>`;
 }
 
-export function buildPsGenerateRepliesPrompt(letters: PsLetterRecord[]): string {
+export function buildPsGenerateRepliesPrompt(
+  letters: PsLetterRecord[],
+): string {
   return [
     GENERATE_SECTIONS.role,
     GENERATE_SECTIONS.task,
@@ -210,6 +212,6 @@ export function buildPsGenerateRepliesPrompt(letters: PsLetterRecord[]): string 
     GENERATE_SECTIONS.examples,
     GENERATE_SECTIONS.edgeCases,
     GENERATE_SECTIONS.validationChecklist,
-    GENERATE_SECTIONS.outputFormat
-  ].join('\n\n');
+    GENERATE_SECTIONS.outputFormat,
+  ].join("\n\n");
 }
