@@ -101,7 +101,8 @@ Process ALL requested letters below. For each item:
     Format pattern: "Huzoor Anwar (may Allah be his Helper) has received your letter [requesting/asking/inquiring about/mentioning] [specific matter from the letter]. Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers."
 
     Construction rules:
-    - Must be exactly one sentence. No compound sentences or multiple clauses.
+    - Must be exactly two sentences: (1) the acknowledgment sentence beginning with the required prefix, then (2) the fixed sentence "Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers."
+    - The acknowledgment sentence must be a single, concise sentence with no compound or multiple unrelated clauses.
     - Focus on the primary concern or request expressed in the letter.
     - Use formal, concise, respectful wording.
     - Use appropriate verbs: requesting, asking, inquiring about, mentioning, seeking guidance regarding.
@@ -182,7 +183,7 @@ Schema:
     "letter_id": "L001",
     "full_name": "string",
     "location": "string",
-    "inquiry": "I have received your letter ...",
+    "inquiry": "Huzoor Anwar (may Allah be his Helper) has received your letter ...",
     "prayer_sentence": "May Allah Taala ... Amin"
   }
 ]

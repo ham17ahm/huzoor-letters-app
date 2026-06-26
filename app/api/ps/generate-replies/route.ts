@@ -3,7 +3,7 @@ import { getPsGenerateRepliesModel } from '@/lib/aiModelConfig';
 import { generateWithGeminiPdf, shouldLogGeminiRequests } from '@/lib/gemini';
 import { parseJsonFromText } from '@/lib/json';
 import { buildPsGenerateRepliesPrompt } from '@/lib/ps/prompts';
-import { normalizeBulkReplies } from '@/lib/validators';
+import { normalizePsBulkReplies } from '@/lib/ps/validators';
 import { getPdfSession } from '@/lib/pdfSession';
 import type { PsLetterRecord } from '@/types/ps';
 
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     });
 
     const parsed = parseJsonFromText<unknown>(rawText);
-    const replies = normalizeBulkReplies(
+    const replies = normalizePsBulkReplies(
       parsed,
       letters.map((letter) => letter.letter_id)
     );

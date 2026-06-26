@@ -135,16 +135,20 @@ Generate Replies → review → print), with two amendments:
 2. **Different prompts** — `lib/ps/prompts.ts` refactors the prompt into named, independently
    editable section constants composed at build time (vs. the standard monolithic template
    literal). The only dynamic piece is the injected `<requested_letters>` payload. The section
-   bodies are currently interim, note-free placeholders to be replaced with final PS prompt
-   text; the `buildPs*` functions do not change when the text is swapped.
+   bodies now hold the real PS prompt text (e.g. the two-sentence "Huzoor Anwar …" inquiry);
+   the `buildPs*` functions do not change when the text is edited.
 
 ### Isolation model
 
 - **Reused untouched (shared, safe):** `lib/gemini.ts`, `lib/json.ts`, `lib/pageRanges.ts`,
-  `lib/pdfSession.ts`, `lib/validators.ts`, `lib/date.ts`, `lib/textInsertion.ts`,
+  `lib/pdfSession.ts`, `lib/date.ts`, `lib/textInsertion.ts`,
   `lib/inquiryPhraseButtons.ts`, `lib/toolbarConfig.ts`, `lib/printConfig.ts`,
   `components/PdfViewer.tsx`, `components/PdfUploader.tsx`, `components/LetterPagination.tsx`,
   `components/PrintPreview.module.css`, and `app/api/clear-pdf/route.ts`.
+- **Partially reused:** `lib/validators.ts` — PS reuses `normalizeBoundaries` (analyze route,
+  prompt-agnostic), but reply normalization is forked (see `lib/ps/validators.ts` below)
+  because the shared `normalizeReply` hardcodes the standard "I have received your letter"
+  inquiry prefix, which would corrupt the PS inquiry.
 - **Shared files modified (additive only — `/` unaffected):**
   - `lib/aiModelConfig.ts` — added `getPsDetectPdfModel()` / `getPsGenerateRepliesModel()`
     (`GEMINI_PS_DETECT_PDF_MODEL`, `GEMINI_PS_GENERATE_REPLIES_MODEL`).
@@ -158,13 +162,18 @@ Generate Replies → review → print), with two amendments:
   - `components/ps/PsLetterFormCard.tsx`, `PsLetterFormList.tsx`, `PsLetterSidebar.tsx`
   - `lib/ps/prompts.ts`, `lib/ps/apiClient.ts`, `lib/ps/letterListOperations.ts`
     (note merging removed)
+  - `lib/ps/validators.ts` — `normalizePsReply` / `normalizePsBulkReplies`. Enforces the PS
+    inquiry prefix ("Huzoor Anwar (may Allah be his Helper) has received your letter") and a
+    two-sentence inquiry (no single-sentence collapse), keeps the prayer "May Allah Taala … Amin"
+    handling and the `letter_id` structural checks. Used by the PS generate route instead of the
+    shared `normalizeBulkReplies`.
   - `lib/ps/printDocument.ts` — PS print uses a **different letterhead** (Private Secretary
     template). `openPsPrintPreview(letters)` opens a popup and `document.write`s a full,
     self-contained HTML/CSS document (no `/ps/print` route, no `localStorage` hand-off). It
     maps `full_name`/`inquiry`/`prayer_sentence`/`location` and needs `public/` assets:
     `/fonts/Adobe Naskh Medium.ttf` (Kufi) and `/img/SignPS_English.png` (signature).
   - `types/ps.ts` (`PsLetterRecord = Omit<LetterRecord, 'note'>` + response types)
-  - `tests/psLetterListOperations.test.ts`
+  - `tests/psLetterListOperations.test.ts`, `tests/psValidators.test.ts`
 
 `PsLetterRecord` reuses the already note-free reply types (`GenerateReplyResult` /
 `BulkGenerateReplyResult`), and PS reuses the same in-memory `pdfSession` store and the shared
@@ -278,5 +287,6 @@ Completed refactors in this phase:
 16. Changed Inquiry phrase buttons to a two-column grid so more buttons can fit without expanding the panel as much.
 17. Added an isolated, note-free `/ps` route (clone of the app) with its own pages, API routes, hook, components, prompts (refactored into section constants), print hand-off, and types. Shared pure utilities are reused; only `lib/aiModelConfig.ts` and `components/Toolbar.tsx` were touched additively. A `[Standard] [PS]` cross-link nav was added to the shared header. See "PS Route" above.
 18. Replaced the PS print with a distinct Private Secretary letterhead template (`lib/ps/printDocument.ts`, `openPsPrintPreview`) that opens a popup and writes a self-contained HTML/CSS document. Removed the earlier route-based PS print (`app/ps/print/*`, `components/ps/PsPrintPreview.tsx`, `lib/ps/printPreviewSession.ts`). New `public/` assets are required: `/fonts/Adobe Naskh Medium.ttf` and `/img/SignPS_English.png`.
+19. Authored the real PS generate prompt (inquiry now a two-sentence "Huzoor Anwar (may Allah be his Helper) has received your letter … Following the perusal …" format) and forked reply normalization into `lib/ps/validators.ts` so the shared `normalizeReply` no longer corrupts the PS inquiry by forcing the standard "I have received your letter" prefix. Added `tests/psValidators.test.ts`.
 
 The app is currently in a stable, extensible state aligned with these changes.
