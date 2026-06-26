@@ -55,10 +55,12 @@ in an in-memory `pdfSession`, 2h TTL) → [enter notes — `/` only] → **Gener
   letterhead template in `lib/ps/printDocument.ts` (`openPsPrintPreview`) that opens a popup
   and `document.write`s its own full HTML/CSS document — there is no `/ps/print` route. The PS
   template needs assets in `public/`: `/fonts/Adobe Naskh Medium.ttf` (Kufi) and
-  `/img/SignPS_English.png` (signature); `/fonts/_Khat_Manzoor.ttf` already exists.
-- `next.config.ts` deliberately splits dev (`.next/dev`) vs build (`.next`) output. Running
-  `npm run build` rewrites `next-env.d.ts` to point at `.next/types`; `npm run dev` flips it
-  back. Don't commit that flip.
+  `/img/SignPS_English.png` (signature); `/fonts/_Khat_Manzoor.ttf` already exists. The popup
+  pins `<base href="${origin}/">` so root-relative asset URLs always resolve.
+- `next.config.ts` outputs dev to the **sibling** dir `.next-dev` and build to `.next` (both
+  gitignored + eslint-ignored). They no longer nest, so `npm run build` can't wipe a running dev
+  server. `next-env.d.ts` references `.next-dev/types` in dev and `.next/types` after a build;
+  it auto-regenerates and the flip is cosmetic.
 - Use Node 20 LTS (`engines: >=20 <23`); avoid Node 24 (chunk runtime mismatches).
 
 ## Verification (run before declaring done)

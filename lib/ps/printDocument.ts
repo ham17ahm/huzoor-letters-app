@@ -127,12 +127,19 @@ export function openPsPrintPreview(data: PsLetterRecord[]): void {
     return;
   }
 
+  // The popup is an about:blank document, where the base URL for resolving
+  // root-relative asset URLs (/fonts/*, /img/*) is not reliably the app origin.
+  // Pin it explicitly to the opener's origin so fonts and the signature image
+  // always load.
+  const baseHref = `${window.location.origin}/`;
+
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<base href="${baseHref}" />
 <title>Letters — Print Preview</title>
 <style>
 

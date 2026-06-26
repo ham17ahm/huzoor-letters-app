@@ -238,11 +238,16 @@ When enabled, `lib/gemini.ts` logs the full `generateContent` request body befor
 
 ### Dev/build artifact isolation (critical)
 
-To avoid runtime chunk mismatch issues, `next.config.ts` separates output:
-- Dev server output: `.next/dev`
+`next.config.ts` separates output into **sibling** directories:
+- Dev server output: `.next-dev`
 - Build/start output: `.next`
 
-This prevents collisions when `next dev` and `next build` are run at different times.
+Earlier these were nested (`.next/dev` inside `.next`), which meant `next build` — which
+wipes its whole `distDir` (`.next`) — would delete a running dev server's artifacts and break
+it with `ENOENT` manifest errors. Using a sibling `.next-dev` prevents that entirely: build and
+dev never touch each other's files. Both `.next-dev` and `.next` are gitignored; eslint ignores
+both; `next-env.d.ts` references `.next-dev/types` in dev and `.next/types` after a build (it
+auto-regenerates — don't hand-maintain it, and the dev/prod flip is cosmetic).
 
 ### If dev runtime breaks with chunk/module errors
 
@@ -251,7 +256,7 @@ Run:
 ```bash
 pkill -f "next dev" || true
 pkill -f "next start" || true
-rm -rf .next
+rm -rf .next-dev
 npm run dev
 ```
 
@@ -288,5 +293,6 @@ Completed refactors in this phase:
 17. Added an isolated, note-free `/ps` route (clone of the app) with its own pages, API routes, hook, components, prompts (refactored into section constants), print hand-off, and types. Shared pure utilities are reused; only `lib/aiModelConfig.ts` and `components/Toolbar.tsx` were touched additively. A `[Standard] [PS]` cross-link nav was added to the shared header. See "PS Route" above.
 18. Replaced the PS print with a distinct Private Secretary letterhead template (`lib/ps/printDocument.ts`, `openPsPrintPreview`) that opens a popup and writes a self-contained HTML/CSS document. Removed the earlier route-based PS print (`app/ps/print/*`, `components/ps/PsPrintPreview.tsx`, `lib/ps/printPreviewSession.ts`). New `public/` assets are required: `/fonts/Adobe Naskh Medium.ttf` and `/img/SignPS_English.png`.
 19. Authored the real PS generate prompt (inquiry now a two-sentence "Huzoor Anwar (may Allah be his Helper) has received your letter … Following the perusal …" format) and forked reply normalization into `lib/ps/validators.ts` so the shared `normalizeReply` no longer corrupts the PS inquiry by forcing the standard "I have received your letter" prefix. Added `tests/psValidators.test.ts`.
+20. Hardening pass: moved dev output to the sibling `.next-dev` (was nested `.next/dev`) so `next build` can no longer wipe a running dev server — updated `next.config.ts`, `.gitignore`, `eslint.config.mjs`, `tsconfig.json`, `tsconfig.test.json`. Pinned `<base href="${origin}/">` in the PS print popup (`lib/ps/printDocument.ts`) so root-relative font/image URLs always resolve. Verified `.next-dev` survives a build and that the configured Gemini model ids (`gemini-3.1-pro-preview`, `gemini-2.5-flash`) exist via ListModels.
 
 The app is currently in a stable, extensible state aligned with these changes.
