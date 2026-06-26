@@ -459,3 +459,17 @@ input[aria-invalid="true"] {
     grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
   }
 }
+
+/* ---------------------------------------------------------------------------
+   PS route — scoped text-field heights
+   These apply ONLY under the `.psRoute` wrapper (set on the root in
+   app/ps/page.tsx) and override the shared base rules above. Adjust PS
+   text-field heights here WITHOUT affecting the standard `/` route.
+   --------------------------------------------------------------------------- */
+.psRoute textarea {
+  min-height: 175px; /* PS: prayer sentence + any plain textarea */
+}
+
+.psRoute .inquiryComposer textarea {
+  min-height: 150px; /* PS: inquiry field */
+}

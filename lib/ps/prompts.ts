@@ -98,14 +98,14 @@ Process ALL requested letters below. For each item:
     A single formal sentence acknowledging the letter and its primary concern.
 
     Required prefix: "Huzoor Anwar (may Allah be his Helper) has received your letter ... Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers."
-    Format pattern: "Huzoor Anwar (may Allah be his Helper) has received your letter [requesting/asking/inquiring about/mentioning] [specific matter from the letter]. Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers."
+    Format pattern: "Huzoor Anwar (may Allah be his Helper) has received your letter [requesting prayers/asking prayers/seeking prayers] [specific matter from the letter]. Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers."
 
     Construction rules:
     - Must be exactly two sentences: (1) the acknowledgment sentence beginning with the required prefix, then (2) the fixed sentence "Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers."
     - The acknowledgment sentence must be a single, concise sentence with no compound or multiple unrelated clauses.
     - Focus on the primary concern or request expressed in the letter.
     - Use formal, concise, respectful wording.
-    - Use appropriate verbs: requesting, asking, inquiring about, mentioning, seeking guidance regarding.
+    - Use appropriate verbs: requesting, asking, seeking etc.
     - Avoid vague wording like "various matters" or "several issues".
     - Avoid unnecessary background details.
     - Avoid combining multiple unrelated topics in one sentence.
@@ -144,7 +144,55 @@ Process ALL requested letters below. For each item:
         "full_name": "Ahmad Hassan",
         "location": "Toronto, Canada",
         "inquiry": "Huzoor Anwar (may Allah be his Helper) has received your letter requesting prayers regarding your wife's treatment who is undergoing some pregnancy complications. Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers.",
-        "prayer_sentence": "May Allah Taala grant your wife an easy and safe delivery and bless you and your family with a healthy and righteous child who becomes a source of comfort for you all. May Allah always be with your growing family and keep you in His care. Amin"
+        "prayer_sentence": "May Allah Taala grant your wife complete healing, an easy and safe delivery and bless you and your family with a healthy and righteous child, who becomes a source of comfort for you all. May Allah always be with your growing family and keep you in His care. Amin"
+      }
+    </output>
+  </example>
+
+  <example>
+    <input>
+      letter_id: "L002"
+      source_pages: "2"
+    </input>
+    <output>
+      {
+        "letter_id": "L002",
+        "full_name": "Fatima Ali",
+        "location": "London, UK",
+        "inquiry": "Huzoor Anwar (may Allah be his Helper) has received your letter requesting prayers for success in your university applications. Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers.",
+        "prayer_sentence": "May Allah Taala grant you success in your higher studies and enable you to serve the Jamaat in the best possible way through your academic and professional endeavours. May your aspirations be fulfilled with ease and your efforts crowned with achievement. May Allah always be with you. Amin"
+      }
+    </output>
+  </example>
+
+  <example>
+    <input>
+      letter_id: "L003"
+      source_pages: "3"
+    </input>
+    <output>
+      {
+        "letter_id": "L003",
+        "full_name": "Muhammad Khan",
+        "location": "Karachi, Pakistan",
+        "inquiry": "Huzoor Anwar (may Allah be his Helper) has received your letter requesting prayers regarding your business difficulties and financial hardships. Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers.",
+        "prayer_sentence": "May Allah Taala remove all your financial difficulties and grant you abundant sustenance. May He open the doors of His mercy and blessings upon your business and make it a source of benefit for you and your family. May He always keep you steadfast in faith during times of hardship and grant you patience and contentment. Amin"
+      }
+    </output>
+  </example>
+
+  <example>
+    <input>
+      letter_id: "L004"
+      source_pages: "4"
+    </input>
+    <output>
+      {
+        "letter_id": "L004",
+        "full_name": "Sarah Ahmed",
+        "location": "Taiwan",
+        "inquiry": "Huzoor Anwar (may Allah be his Helper) has received your letter requesting prayers for finding a suitable life-companion. Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers.",
+        "prayer_sentence": "May Allah Taala guide you towards a partner who will be a source of harmony, comfort and mutual support. May He make this journey easy for you, granting you a companion of good character and virtue. May Allah always be with you and keep you in His protection. Amin"
       }
     </output>
   </example>

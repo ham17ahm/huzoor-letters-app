@@ -32,7 +32,7 @@ export default function PsHome() {
   }));
 
   return (
-    <div className="appShell">
+    <div className="appShell psRoute">
       <Toolbar
         actions={toolbarActions}
         subtitle="Upload → Detect PDF → Generate Replies → Review → Print"
