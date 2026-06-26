@@ -112,22 +112,63 @@ Process ALL requested letters below. For each item:
   </field>
 
   <field name="prayer_sentence">
-    A warm, compassionate, formal prayer tailored to the letter's specific situation.
+    A warm, compassionate, formal prayer tailored to the letter's situation, kept deliberately generic and gracious.
 
     Required prefix: "May Allah Taala"
     Required suffix: "Amin"
 
-    Construction guidance by topic:
-    - Health matters: include healing, comfort, ease of treatment, and family support.
-    - Decisions and guidance: include divine guidance, wisdom, clarity, and peace of mind.
-    - Education and career: include success, benefit to the Jamaat, and personal fulfilment.
-    - Family matters: include harmony, blessings, protection, and unity.
-    - Financial difficulties: include removal of hardship, abundant sustenance, and patience.
+    Length:
+    - STRICTLY 2 to 3 sentences in total. The closing "Amin" is appended after the final sentence and is NOT counted toward this limit.
 
-    General requirements:
-    - Relate the prayer to the specific situation described in the letter in a generic way.
-    - Address both the immediate concern and broader blessings.
-    - Maintain a warm, compassionate, and respectful tone throughout.
+    Tone and approach:
+    - Favour an elegant, generic, and uplifting tone over specificity. Brevity and graciousness are preferred over depth and detail.
+    - Avoid being overly direct about the difficulty itself; naming it plainly can cause the recipient unease.
+    - Do NOT restate distressing specifics from the letter (for example a diagnosis, a conflict, a bereavement, or a failure). Frame every prayer around positive outcomes and broader blessings.
+    - The inquiry already names the specific concern, so the prayer should relate to the situation only in a generic way and need not repeat the specifics.
+
+    Anonymisation:
+    - Refer to individuals only by their relationship to the writer (e.g., wife, husband, son, daughter, father, mother, brother, sister, father-in-law, mother-in-law, friend, colleague).
+    - Do NOT include personal names, place names, or dates in the prayer.
+
+    Language and spelling:
+    - Use UK English spelling throughout (e.g., "fulfil", "favour", "honour", "realise", "endeavours").
+    - Avoid non-English words that have a natural English equivalent (e.g., do NOT use "Barakah", "Shifa", "Sehat", "Rahmah"); use the English equivalent instead.
+    - Preserve Ahmadiyya domain-specific terms that have no direct English equivalent, such as "Jamaat", "Majlis", "Lajna", "Khilafat", "Ahmadiyyat", "Waqf", "Khuddam", "Ansar", "Nasirat", "Atfal".
+
+    Thematic guidance (draw upon ONLY what fits naturally; never force every element):
+    - Health matters: healing, comfort, restoration of health, and family support.
+    - Decisions and guidance: divine guidance, wisdom, clarity, and peace of mind.
+    - Education and career: success, benefit to the Jamaat, and personal fulfilment.
+    - Family matters: harmony, blessings, protection, and unity.
+    - Financial difficulties: removal of hardship, abundant sustenance, and patience.
+
+    Multiple concerns:
+    - If the letter raises several concerns, weave them together generically within the 2-3 sentence limit rather than addressing each one at length.
+    - Where it fits naturally within the limit, the prayer may touch on both the immediate concern and a broader blessing, but the length limit always takes priority.
+
+    <comparative_examples>
+      <example theme="pregnancy_and_career">
+        <avoid>May He bless you with a healthy pregnancy and grant you the wisdom to maintain an ideal balance between your professional aspirations and family life.</avoid>
+        <prefer>May He bless you with a healthy pregnancy and enable you to fulfil your professional and family responsibilities in the best possible manner.</prefer>
+        <reasoning>The preferred version is more generic and elegant, avoiding overly direct framing of the issue.</reasoning>
+      </example>
+      <example theme="child_development">
+        <avoid>May Allah Taala grant your son good health and may he develop his speech abilities.</avoid>
+        <prefer>May Allah Taala grant your son good health and bless him with a healthy and prosperous life.</prefer>
+        <reasoning>The preferred version stays positive without naming a specific difficulty that could impose unease on the recipient.</reasoning>
+      </example>
+      <example theme="illness_and_pain">
+        <avoid>May Allah Taala grant your daughter complete healing and relief from her pain, guiding her treatment towards a full recovery and bestowing upon her an excellent destiny.</avoid>
+        <prefer>May Allah Taala grant your daughter relief and complete restoration of her health and keep her under His divine care.</prefer>
+        <reasoning>The preferred version is shorter and more merciful, omitting unnecessary detail that could cause unease.</reasoning>
+      </example>
+    </comparative_examples>
+
+    <reference_prayers note="prayer text only; included to illustrate generic, well-formed prayers">
+      - "May Allah Taala grant you success in your academic pursuits. May He increase your intellectual and secular abilities and guide you on the right path. May Allah always be with you, keeping you under His divine care. Amin"
+      - "May Allah Taala grant your son strength and resilience. May He provide him with patience and perseverance and protect him from every difficulty. May your family find peace and stability and may Allah always be with you all. Amin"
+      - "May Allah Taala remove every difficulty pertaining to your business and grant you peace and prosperity. May He provide you with the best outcomes and may your efforts bear many fruits. May Allah always be with you. Amin"
+    </reference_prayers>
   </field>
 
 </field_specifications>`,
@@ -205,6 +246,7 @@ Process ALL requested letters below. For each item:
   - If a letter spans multiple pages, use the full content across all its source_pages to understand the context.
   - If a letter contains multiple unrelated topics, focus on the primary concern.
   - If any part of the letter content is illegible, extract what is available and work with the readable portions.
+  - If a letter is emotionally heavy or highly detailed, the prayer_sentence must still remain generic, brief (2-3 sentences), positively framed, and free of distressing specifics.
   - Stay grounded in the actual letter. Do not invent names, places, events, requests, or personal details.
 </edge_cases>`,
 
@@ -213,14 +255,18 @@ Before returning your response, verify each letter entry against these checks:
 1. letter_id exactly matches one of the requested letter_ids.
 2. full_name is extracted from the letter or set to "N/A".
 3. location follows the "City, Country" format or is set to "N/A".
-4. inquiry starts with "Huzoor Anwar (may Allah be his Helper) has received your letter", follwed by the specific matter from the letter extracted contextually from the content. Followed by: "Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers.".
+4. inquiry starts with "Huzoor Anwar (may Allah be his Helper) has received your letter", followed by the specific matter from the letter extracted contextually from the content. Followed by: "Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers.".
 5. inquiry focuses on the primary concern of the letter.
 6. prayer_sentence starts with "May Allah Taala" and ends with "Amin".
-7. prayer_sentence directly relates to the inquiry and the letter content.
-8. No details from one letter have been used in another letter's output.
-9. All requested letter_ids have exactly one corresponding result.
-10. No extra letter_ids are present in the output.
-11. The overall tone is formal, respectful, and compassionate throughout.
+7. prayer_sentence is strictly 2 to 3 sentences (the closing "Amin" is not counted).
+8. prayer_sentence is generic and uplifting, does not restate distressing specifics, and is not overly direct about the difficulty.
+9. prayer_sentence refers to individuals only by relationship and contains no personal names, place names, or dates.
+10. prayer_sentence uses UK English spelling, avoids non-English words that have English equivalents, and preserves required domain terms (e.g., "Jamaat").
+11. prayer_sentence relates to the letter's situation in a generic way.
+12. No details from one letter have been used in another letter's output.
+13. All requested letter_ids have exactly one corresponding result.
+14. No extra letter_ids are present in the output.
+15. The overall tone is formal, respectful, and compassionate throughout.
 </validation_checklist>`,
 
   outputFormat: `<output_format>
