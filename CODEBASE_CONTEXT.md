@@ -10,6 +10,11 @@ Local Next.js app to process a scanned PDF packet of letters:
 
 No DB/auth/persistence. Data is session-local.
 
+There are two parallel workflows:
+- `/` — the standard workflow (operator types a per-letter **note** that anchors generation).
+- `/ps` — a note-free clone (no note field; replies are generated purely from letter content).
+  See "PS Route" below.
+
 ---
 
 ## Tech Stack
@@ -120,6 +125,50 @@ No DB/auth/persistence. Data is session-local.
 
 ---
 
+## PS Route (`/ps`)
+
+A fully isolated, note-free clone of the app. Same four-stage pipeline (upload → Detect PDF →
+Generate Replies → review → print), with two amendments:
+
+1. **No note field** — removed from the form, sidebar, generation gating, request payload,
+   prompt, and print template. Generation is allowed as soon as letters are detected.
+2. **Different prompts** — `lib/ps/prompts.ts` refactors the prompt into named, independently
+   editable section constants composed at build time (vs. the standard monolithic template
+   literal). The only dynamic piece is the injected `<requested_letters>` payload. The section
+   bodies are currently interim, note-free placeholders to be replaced with final PS prompt
+   text; the `buildPs*` functions do not change when the text is swapped.
+
+### Isolation model
+
+- **Reused untouched (shared, safe):** `lib/gemini.ts`, `lib/json.ts`, `lib/pageRanges.ts`,
+  `lib/pdfSession.ts`, `lib/validators.ts`, `lib/date.ts`, `lib/textInsertion.ts`,
+  `lib/inquiryPhraseButtons.ts`, `lib/toolbarConfig.ts`, `lib/printConfig.ts`,
+  `components/PdfViewer.tsx`, `components/PdfUploader.tsx`, `components/LetterPagination.tsx`,
+  `components/PrintPreview.module.css`, and `app/api/clear-pdf/route.ts`.
+- **Shared files modified (additive only — `/` unaffected):**
+  - `lib/aiModelConfig.ts` — added `getPsDetectPdfModel()` / `getPsGenerateRepliesModel()`
+    (`GEMINI_PS_DETECT_PDF_MODEL`, `GEMINI_PS_GENERATE_REPLIES_MODEL`).
+  - `components/Toolbar.tsx` (+ `.routeNav` styles in `globals.css`) — the `[Standard] [PS]`
+    cross-link nav, active route highlighted via `usePathname`.
+- **PS-specific files (the fork):**
+  - `app/ps/page.tsx`, `app/ps/print/page.tsx`, `app/ps/print/PsPrintPageClient.tsx`
+  - `app/api/ps/analyze-pdf/route.ts`, `app/api/ps/generate-replies/route.ts`
+    (no missing-note check)
+  - `hooks/usePsLetterWorkflow.ts` (note gating + `preserve-manual-note` processor removed)
+  - `components/ps/PsLetterFormCard.tsx`, `PsLetterFormList.tsx`, `PsLetterSidebar.tsx`,
+    `PsPrintPreview.tsx`
+  - `lib/ps/prompts.ts`, `lib/ps/apiClient.ts`, `lib/ps/letterListOperations.ts`
+    (note merging removed), `lib/ps/printPreviewSession.ts` (distinct storage key
+    `huzoor-ps-print-preview:`, opens `/ps/print`)
+  - `types/ps.ts` (`PsLetterRecord = Omit<LetterRecord, 'note'>` + response types)
+  - `tests/psLetterListOperations.test.ts`
+
+`PsLetterRecord` reuses the already note-free reply types (`GenerateReplyResult` /
+`BulkGenerateReplyResult`), and PS reuses the same in-memory `pdfSession` store and the shared
+`/api/clear-pdf` cleanup (sessions are UUID-keyed, so this is safe).
+
+---
+
 ## Extension Points
 
 ### 1) Toolbar config
@@ -163,9 +212,11 @@ Gemini models are configured separately by workflow:
 ```text
 GEMINI_DETECT_PDF_MODEL=gemini-2.5-flash
 GEMINI_GENERATE_REPLIES_MODEL=gemini-2.5-flash
+GEMINI_PS_DETECT_PDF_MODEL=gemini-2.5-flash
+GEMINI_PS_GENERATE_REPLIES_MODEL=gemini-2.5-flash
 ```
 
-`GEMINI_MODEL` remains supported as a fallback if a workflow-specific variable is missing. If neither is set, `lib/aiModelConfig.ts` falls back to the built-in default model.
+`GEMINI_MODEL` remains supported as a fallback if a workflow-specific variable is missing. If neither is set, `lib/aiModelConfig.ts` falls back to the built-in default model. The `GEMINI_PS_*` variables configure the `/ps` route independently and use the same fallback chain.
 
 ### Gemini debug logging
 
@@ -222,5 +273,6 @@ Completed refactors in this phase:
 14. Changed Note and Prayer sentence textareas to sit side by side in the existing two-column form grid.
 15. Increased the global textarea `min-height` to `120px`.
 16. Changed Inquiry phrase buttons to a two-column grid so more buttons can fit without expanding the panel as much.
+17. Added an isolated, note-free `/ps` route (clone of the app) with its own pages, API routes, hook, components, prompts (refactored into section constants), print hand-off, and types. Shared pure utilities are reused; only `lib/aiModelConfig.ts` and `components/Toolbar.tsx` were touched additively. A `[Standard] [PS]` cross-link nav was added to the shared header. See "PS Route" above.
 
 The app is currently in a stable, extensible state aligned with these changes.
