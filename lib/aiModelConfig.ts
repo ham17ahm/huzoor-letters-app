@@ -16,6 +16,14 @@ export const AI_MODEL_CONFIG = {
     defaultModel: 'gemini-2.5-flash',
     envVar: 'GEMINI_PS_GENERATE_REPLIES_MODEL'
   },
+  duaUrduDetectPdf: {
+    defaultModel: 'gemini-2.5-flash',
+    envVar: 'GEMINI_DUA_URDU_DETECT_PDF_MODEL'
+  },
+  duaUrduGenerateReplies: {
+    defaultModel: 'gemini-2.5-flash',
+    envVar: 'GEMINI_DUA_URDU_GENERATE_REPLIES_MODEL'
+  },
   fallbackEnvVar: 'GEMINI_MODEL'
 } as const;
 
@@ -33,6 +41,14 @@ export function getPsDetectPdfModel(): string {
 
 export function getPsGenerateRepliesModel(): string {
   return getConfiguredModel(AI_MODEL_CONFIG.psGenerateReplies);
+}
+
+export function getDuaUrduDetectPdfModel(): string {
+  return getConfiguredModel(AI_MODEL_CONFIG.duaUrduDetectPdf);
+}
+
+export function getDuaUrduGenerateRepliesModel(): string {
+  return getConfiguredModel(AI_MODEL_CONFIG.duaUrduGenerateReplies);
 }
 
 function getConfiguredModel(workflow: { defaultModel: string; envVar: string }): string {

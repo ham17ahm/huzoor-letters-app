@@ -2,6 +2,9 @@
 
 A local, browser-based Next.js app for processing PDF packets of correspondence letters with Gemini.
 
+The app provides three workflows: Standard (`/`), Private Secretary (`/ps`), and the
+note-free Urdu reply workflow Dua Urdu (`/dua-urdu`).
+
 ## What it does
 
 1. Upload one PDF packet.
@@ -53,10 +56,24 @@ The font file is not included. If you have the font, place it at that path. The 
 GEMINI_API_KEY=...
 GEMINI_DETECT_PDF_MODEL=gemini-2.5-flash
 GEMINI_GENERATE_REPLIES_MODEL=gemini-2.5-flash
+GEMINI_PS_DETECT_PDF_MODEL=gemini-2.5-flash
+GEMINI_PS_GENERATE_REPLIES_MODEL=gemini-2.5-flash
+GEMINI_DUA_URDU_DETECT_PDF_MODEL=gemini-2.5-flash
+GEMINI_DUA_URDU_GENERATE_REPLIES_MODEL=gemini-2.5-flash
 DEBUG_GEMINI_REQUESTS=false
 ```
 
-`GEMINI_MODEL` is still supported as a fallback if either workflow-specific model is not set.
+`GEMINI_MODEL` is still supported as a fallback if any workflow-specific model is not set.
+
+## Dua Urdu workflow
+
+- Uses the same note-free upload, boundary review, bulk generation, and editing flow as PS.
+- Only Full Name, Location, Inquiry, and Prayer sentence are localized, RTL, and rendered in
+  Google Amiri; the rest of the application remains English and LTR.
+- Its current Generate Replies prompt is provisional and isolated in `lib/duaUrdu/prompts.ts`
+  so the final supplied prompt can replace it without changing the workflow or API contract.
+- Its current `/dua-urdu/print` view is a deliberately basic A4 RTL preview with an isolated
+  stylesheet ready for the final print template.
 
 Model selection is intentionally route-specific:
 

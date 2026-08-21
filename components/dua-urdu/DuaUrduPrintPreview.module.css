@@ -1,0 +1,96 @@
+.preview {
+  min-height: 100vh;
+  padding: 20px 0;
+  background: #ededeb;
+}
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  width: min(210mm, calc(100% - 24px));
+  margin: 0 auto 12px;
+  padding: 10px 12px;
+  display: flex;
+  direction: ltr;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid #d8d8d3;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.96);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.page {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto 20px;
+  padding: 24mm 25mm;
+  box-sizing: border-box;
+  background: white;
+  color: #111;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.12);
+  direction: rtl;
+  font-family: var(--font-amiri), serif;
+  page-break-after: always;
+}
+
+.page:last-child {
+  page-break-after: auto;
+}
+
+.field {
+  margin-bottom: 10mm;
+}
+
+.label {
+  margin: 0 0 2mm;
+  font-size: 14pt;
+  font-weight: 700;
+}
+
+.value {
+  margin: 0;
+  min-height: 8mm;
+  font-size: 17pt;
+  line-height: 1.9;
+  text-align: right;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  .preview {
+    padding: 0;
+    background: white;
+  }
+
+  .toolbar {
+    display: none;
+  }
+
+  .page {
+    width: 210mm;
+    height: 297mm;
+    min-height: 0;
+    margin: 0;
+    box-shadow: none;
+    break-after: page;
+  }
+
+  .page:last-child {
+    break-after: auto;
+  }
+}

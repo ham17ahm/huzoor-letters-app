@@ -10,10 +10,12 @@ Local Next.js app to process a scanned PDF packet of letters:
 
 No DB/auth/persistence. Data is session-local.
 
-There are two parallel workflows:
+There are three parallel workflows:
 - `/` — the standard workflow (operator types a per-letter **note** that anchors generation).
 - `/ps` — a note-free clone (no note field; replies are generated purely from letter content).
   See "PS Route" below.
+- `/dua-urdu` — a note-free Urdu workflow sharing the PS-style workflow core while keeping its
+  prompt, validation, model configuration, RTL field presentation, and print view isolated.
 
 ---
 
@@ -182,6 +184,16 @@ Generate Replies → review → print), with two amendments:
 ---
 
 ## Extension Points
+
+### Dua Urdu route
+
+- `/dua-urdu` shares generic note-free workflow, editor, and list-operation infrastructure with
+  `/ps`; Standard remains independent because it requires notes and processors.
+- The four reply fields use Urdu labels, `lang="ur"`, RTL direction, and Google Amiri. All other
+  controls remain English and LTR.
+- `lib/duaUrdu/prompts.ts` contains the replaceable provisional generation prompt.
+- `/dua-urdu/print` is a basic route-specific A4 preview pending the final print CSS/template.
+- Dua Urdu has independent `GEMINI_DUA_URDU_*` model environment variables.
 
 ### 1) Toolbar config
 

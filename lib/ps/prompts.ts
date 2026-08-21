@@ -1,5 +1,5 @@
-import type { PsLetterRecord } from "@/types/ps";
-import { formatPageRange } from "@/lib/pageRanges";
+import type { PsLetterRecord } from "../../types/ps";
+import { formatPageRange } from "../pageRanges";
 
 /**
  * PS prompt builders.

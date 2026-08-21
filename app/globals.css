@@ -473,3 +473,28 @@ input[aria-invalid="true"] {
 .psRoute .inquiryComposer textarea {
   min-height: 150px; /* PS: inquiry field */
 }
+
+/* Dua Urdu keeps the application chrome LTR; only the four localized fields are RTL. */
+.duaUrduField {
+  direction: rtl;
+  text-align: right;
+  font-family: var(--font-amiri), serif;
+}
+
+label.duaUrduField {
+  font-size: 17px;
+}
+
+input.duaUrduField,
+textarea.duaUrduField {
+  font-size: 18px;
+  line-height: 1.8;
+}
+
+.duaUrduRoute textarea {
+  min-height: 175px;
+}
+
+.duaUrduRoute .inquiryComposer textarea {
+  min-height: 150px;
+}

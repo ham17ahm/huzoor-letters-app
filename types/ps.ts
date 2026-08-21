@@ -1,8 +1,12 @@
 import type {
-  BulkGenerateReplyResult,
-  GenerateReplyResult,
-  LetterRecord
-} from '@/types/letter';
+  NoteFreeAnalyzePdfResponse,
+  NoteFreeApiError,
+  NoteFreeBulkGenerateReplyResult,
+  NoteFreeGenerateRepliesResponse,
+  NoteFreeGenerateReplyResult,
+  NoteFreeLetterBoundary,
+  NoteFreeLetterRecord
+} from '@/types/noteFree';
 
 /**
  * PS workflow letter record.
@@ -11,28 +15,17 @@ import type {
  * the PS route generates replies purely from the letter content, with no
  * operator-entered note anchor.
  */
-export type PsLetterRecord = Omit<LetterRecord, 'note'>;
+export type PsLetterRecord = NoteFreeLetterRecord;
 
-export type PsLetterBoundary = Pick<PsLetterRecord, 'letter_id' | 'source_pages'>;
+export type PsLetterBoundary = NoteFreeLetterBoundary;
 
 /**
  * Reply result shapes are note-free already, so they are shared with the
  * standard workflow.
  */
-export type PsGenerateReplyResult = GenerateReplyResult;
-export type PsBulkGenerateReplyResult = BulkGenerateReplyResult;
+export type PsGenerateReplyResult = NoteFreeGenerateReplyResult;
+export type PsBulkGenerateReplyResult = NoteFreeBulkGenerateReplyResult;
 
-export type PsApiError = {
-  error?: string;
-};
-
-export type PsAnalyzePdfResponse = {
-  letters: PsLetterRecord[];
-  pdfSessionId: string;
-  rawText?: string;
-};
-
-export type PsGenerateRepliesResponse = {
-  replies: PsBulkGenerateReplyResult[];
-  rawText?: string;
-};
+export type PsApiError = NoteFreeApiError;
+export type PsAnalyzePdfResponse = NoteFreeAnalyzePdfResponse;
+export type PsGenerateRepliesResponse = NoteFreeGenerateRepliesResponse;
