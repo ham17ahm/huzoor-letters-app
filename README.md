@@ -2,8 +2,8 @@
 
 A local, browser-based Next.js app for processing PDF packets of correspondence letters with Gemini.
 
-The app provides three workflows: Standard (`/`), Private Secretary (`/ps`), and the
-note-free Urdu reply workflow Dua Urdu (`/dua-urdu`).
+The app provides four workflows: Standard (`/`), Private Secretary (`/ps`), Dua Urdu
+(`/dua-urdu`), and PS Urdu (`/ps-urdu`).
 
 ## What it does
 
@@ -60,6 +60,8 @@ GEMINI_PS_DETECT_PDF_MODEL=gemini-2.5-flash
 GEMINI_PS_GENERATE_REPLIES_MODEL=gemini-2.5-flash
 GEMINI_DUA_URDU_DETECT_PDF_MODEL=gemini-2.5-flash
 GEMINI_DUA_URDU_GENERATE_REPLIES_MODEL=gemini-2.5-flash
+GEMINI_PS_URDU_DETECT_PDF_MODEL=gemini-2.5-flash
+GEMINI_PS_URDU_GENERATE_REPLIES_MODEL=gemini-2.5-flash
 GEMINI_REQUEST_TIMEOUT_MS=1200000
 DEBUG_GEMINI_REQUESTS=false
 ```
@@ -77,6 +79,17 @@ for Gemini response headers or streamed output.
   correspondence rules and examples can evolve without changing the workflow or API contract.
 - Its `/dua-urdu/print` view uses the dedicated Urdu A4 correspondence template, with an editable
   display date and an isolated print stylesheet.
+
+## PS Urdu workflow
+
+- `/ps-urdu` is a functional duplicate of Dua Urdu with independent API routes, model selectors,
+  prompt seam, print-preview session, and print component/styles.
+- Its temporary `lib/psUrdu/prompts.ts` adapter uses the current Dua Urdu prompt verbatim. Replace
+  that module when the final PS Urdu prompt is supplied.
+- Its `/ps-urdu/print` view uses the supplied Private Secretary Urdu letterhead, isolated under
+  `components/ps-urdu/`. It uses the Jameel, Hasan Hiba (Kufi), and Usman font files in
+  `public/fonts/`.
+- If `GEMINI_PS_URDU_*` variables are unset, PS Urdu inherits the corresponding Dua Urdu model.
 
 Model selection is intentionally route-specific:
 

@@ -13,7 +13,8 @@ type Props = {
 const ROUTE_LINKS = [
   { href: '/', label: 'Standard' },
   { href: '/ps', label: 'PS' },
-  { href: '/dua-urdu', label: 'Dua Urdu' }
+  { href: '/dua-urdu', label: 'Dua Urdu' },
+  { href: '/ps-urdu', label: 'PS Urdu' }
 ] as const;
 
 export function Toolbar({

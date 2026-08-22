@@ -1,0 +1,225 @@
+@font-face {
+  font-family: Jameel;
+  src: url("/fonts/Jameel Noori Nastaleeq.ttf");
+}
+
+@font-face {
+  font-family: Kufi;
+  src: url("/fonts/ArbFONTS-Hasan_Hiba.ttf");
+}
+
+@font-face {
+  font-family: Usman;
+  src: url("/fonts/UTHMANTN1B VER09.OTF");
+}
+
+.preview {
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px 0;
+  background-color: #fff;
+  font-family: serif;
+}
+
+/* Preview controls are outside the supplied letter template and hidden when printing. */
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  width: min(210mm, calc(100% - 24px));
+  margin: 0 auto 12px;
+  padding: 10px 12px;
+  display: flex;
+  direction: ltr;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid #d8d8d3;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.96);
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+}
+
+.dateControl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font: inherit;
+}
+
+.dateControl input {
+  width: 170px;
+  padding: 7px 9px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.letterContainer {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  margin: 20px auto;
+  padding-top: 1.7cm;
+  padding-bottom: 2cm;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  page-break-after: always;
+  border: 1px solid #ddd;
+  overflow: hidden;
+}
+
+.letterContainer:last-child {
+  page-break-after: auto;
+}
+
+.pageHead {
+  padding-right: 1.35cm;
+  direction: rtl;
+}
+
+.htc {
+  color: blue;
+}
+
+.letterheadBismillah {
+  text-align: center;
+  font-size: 15pt;
+}
+
+.letterheadHeading {
+  font-family: Kufi, serif;
+  font-size: 26pt;
+  line-height: 26pt;
+}
+
+.letterheadHeadingSmall {
+  font-family: Kufi, serif;
+  font-size: 17pt;
+  line-height: 16pt;
+}
+
+.letterheadHeadingIslamabad {
+  font-family: Jameel, serif;
+  font-size: 14pt;
+  line-height: 12pt;
+}
+
+.topPage {
+  margin-right: 3.8cm;
+  margin-left: 3.8cm;
+  direction: rtl;
+}
+
+.titleFullname {
+  text-indent: 2.4em;
+  margin-top: 4mm;
+  font-family: Jameel, serif;
+}
+
+.salam {
+  text-align: center;
+  font-family: Jameel, serif;
+  font-size: 18pt;
+}
+
+.mainText {
+  text-align: justify;
+  font-family: Jameel, serif;
+  line-height: 1.75;
+}
+
+.mainText p {
+  margin-top: 2mm;
+  margin-bottom: 2mm;
+  text-indent: 1.6em;
+}
+
+.wassalam {
+  text-align: center;
+  margin-bottom: -0.25em;
+  font-size: 18pt;
+  font-family: Jameel, serif;
+}
+
+.greetingEnd {
+  text-align: center;
+  font-size: 18pt;
+  font-family: Jameel, serif;
+  margin-bottom: 17mm;
+}
+
+.signatureTitle {
+  text-align: center;
+  font-size: 22pt;
+  font-family: Usman, serif;
+}
+
+.footnoteContainer {
+  position: absolute;
+  bottom: 1.75cm;
+  left: 3.25cm;
+  right: 2cm;
+  font-size: 14pt;
+  font-family: Jameel, serif;
+  direction: rtl;
+  white-space: pre-wrap;
+}
+
+.text {
+  font-size: 18pt;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .letterContainer,
+  .letterContainer * {
+    color: #000 !important;
+    text-shadow: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  .letterContainer .htc {
+    color: blue !important;
+  }
+
+  .preview {
+    padding: 0;
+    background-color: white;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .toolbar {
+    display: none !important;
+  }
+
+  .letterContainer {
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    box-shadow: none;
+    border: none;
+    page-break-after: always;
+    break-after: page;
+    position: relative;
+  }
+
+  .letterContainer:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+}

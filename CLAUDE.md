@@ -7,27 +7,28 @@ narrative, see `CODEBASE_CONTEXT.md`; for user-facing usage, see `README.md`.
 
 Local, single-session Next.js 15 / React 19 app that turns a scanned PDF packet of letters
 into one printable A4 reply per letter, using the Gemini REST API (plain `fetch`, no SDK).
-No database, no auth, no persistence — all state is session-local. Only runtime deps are
-`next`, `react`, `react-dom`.
+No database, no auth, no persistence — all state is session-local. Runtime dependencies are
+`next`, `react`, `react-dom`, and `undici` (for scoped long-running Gemini transport settings).
 
-## Two parallel workflows
+## Four parallel workflows
 
 | Route | Purpose | Notes |
 |-------|---------|-------|
 | `/`   | Standard workflow | Operator types a **note** per letter; the note anchors generation. |
 | `/ps` | Note-free clone | **No note field.** Replies are generated purely from letter content. |
+| `/dua-urdu` | Urdu reply workflow | Note-free Urdu generation and dedicated Urdu print view. |
+| `/ps-urdu` | PS Urdu workflow | Dua Urdu duplicate with isolated prompt and print replacement seams. |
 
 `/ps` is an isolated fork. It **reuses** stable, side-effect-free libs and only forks what
 embeds note logic or differs. The two shared files it touches are additive only:
 `lib/aiModelConfig.ts` (PS model selectors) and `components/Toolbar.tsx` (the `[Standard] [PS]`
 cross-link nav). Keep `/` behavior unchanged when editing PS.
 
-## The pipeline (both routes)
+## The pipeline
 
-Upload → **Detect PDF** (`/api/[ps/]analyze-pdf`, Gemini returns letter boundaries; PDF cached
+Upload → **Detect PDF** (route-specific analyze API; Gemini returns letter boundaries; PDF cached
 in an in-memory `pdfSession`, 2h TTL) → [enter notes — `/` only] → **Generate Replies**
-(`/api/[ps/]generate-replies`, one bulk Gemini call reusing the cached PDF) → review/edit →
-**Print** (opens `/[ps/]print` in a new tab via a `localStorage` hand-off).
+(route-specific generate API; one bulk Gemini call reusing the cached PDF) → review/edit → print.
 
 ## Key seams
 
@@ -39,6 +40,12 @@ in an in-memory `pdfSession`, 2h TTL) → [enter notes — `/` only] → **Gener
   build time. Edit one section in isolation; the only dynamic piece is the injected
   `<requested_letters>` payload. **Section bodies are interim placeholders — replace with the
   final PS prompt text when provided; the `build*` functions stay the same.**
+- `lib/duaUrdu/prompts.ts` — current Dua Urdu prompt implementation.
+- `lib/psUrdu/prompts.ts` — PS Urdu prompt seam; currently delegates verbatim to Dua Urdu and is
+  the only prompt module to replace when the final PS Urdu prompt is provided.
+- `components/ps-urdu/PsUrduPrintPreview.tsx` and its CSS module — isolated supplied Private
+  Secretary Urdu print template. It maps full name, inquiry/prayer paragraphs, location, and an
+  editable date, and uses the Jameel, Hasan Hiba (Kufi), and Usman fonts in `public/fonts/`.
 - `lib/validators.ts`, `lib/json.ts`, `lib/pageRanges.ts`, `lib/pdfSession.ts`,
   `lib/gemini.ts` — shared Gemini transport using `streamGenerateContent` SSE and a configurable
   long-running Undici dispatcher. `lib/geminiSse.ts` assembles streamed UTF-8 text for the
@@ -88,6 +95,8 @@ GEMINI_PS_DETECT_PDF_MODEL=gemini-2.5-flash
 GEMINI_PS_GENERATE_REPLIES_MODEL=gemini-2.5-flash
 GEMINI_DUA_URDU_DETECT_PDF_MODEL=gemini-2.5-flash
 GEMINI_DUA_URDU_GENERATE_REPLIES_MODEL=gemini-2.5-flash
+GEMINI_PS_URDU_DETECT_PDF_MODEL=gemini-2.5-flash
+GEMINI_PS_URDU_GENERATE_REPLIES_MODEL=gemini-2.5-flash
 GEMINI_REQUEST_TIMEOUT_MS=1200000
 DEBUG_GEMINI_REQUESTS=false
 ```

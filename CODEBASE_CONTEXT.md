@@ -10,12 +10,15 @@ Local Next.js app to process a scanned PDF packet of letters:
 
 No DB/auth/persistence. Data is session-local.
 
-There are three parallel workflows:
+There are four parallel workflows:
 - `/` — the standard workflow (operator types a per-letter **note** that anchors generation).
 - `/ps` — a note-free clone (no note field; replies are generated purely from letter content).
   See "PS Route" below.
 - `/dua-urdu` — a note-free Urdu workflow sharing the PS-style workflow core while keeping its
   prompt, validation, model configuration, RTL field presentation, and print view isolated.
+- `/ps-urdu` — a duplicate of Dua Urdu with independent route/API paths, model selectors, prompt
+  seam, print session, and print component/styles. Its supplied Private Secretary Urdu print
+  design is implemented; its prompt temporarily matches Dua Urdu until the final prompt arrives.
 
 ---
 
@@ -199,6 +202,21 @@ Generate Replies → review → print), with two amendments:
 - `/dua-urdu/print` uses the dedicated Urdu A4 correspondence template and route-specific CSS.
 - Dua Urdu has independent `GEMINI_DUA_URDU_*` model environment variables.
 
+### PS Urdu route
+
+- `/ps-urdu` and `/api/ps-urdu/*` reuse the generic note-free workflow and Dua Urdu editor/
+  validation behavior.
+- `lib/psUrdu/prompts.ts` is the dedicated replacement seam. It temporarily delegates to the
+  current Dua Urdu prompt so behavior is identical until the final prompt is provided.
+- `/ps-urdu/print`, `components/ps-urdu/PsUrduPrintPreview.tsx`, and its CSS module form a fully
+  separate print path implementing the supplied blue Private Secretary Urdu letterhead. It uses
+  `/fonts/Jameel Noori Nastaleeq.ttf`, `/fonts/ArbFONTS-Hasan_Hiba.ttf`, and
+  `/fonts/UTHMANTN1B VER09.OTF`.
+- `lib/psUrdu/printPreviewSession.ts` uses the isolated
+  `huzoor-ps-urdu-print-preview:` local-storage namespace.
+- `GEMINI_PS_URDU_*` overrides are independent; when absent, selectors inherit the matching
+  `GEMINI_DUA_URDU_*` setting before using the global/default fallback.
+
 ### 1) Toolbar config
 
 - `lib/toolbarConfig.ts` + `types/toolbar.ts`
@@ -244,6 +262,8 @@ GEMINI_PS_DETECT_PDF_MODEL=gemini-2.5-flash
 GEMINI_PS_GENERATE_REPLIES_MODEL=gemini-2.5-flash
 GEMINI_DUA_URDU_DETECT_PDF_MODEL=gemini-2.5-flash
 GEMINI_DUA_URDU_GENERATE_REPLIES_MODEL=gemini-2.5-flash
+GEMINI_PS_URDU_DETECT_PDF_MODEL=gemini-2.5-flash
+GEMINI_PS_URDU_GENERATE_REPLIES_MODEL=gemini-2.5-flash
 GEMINI_REQUEST_TIMEOUT_MS=1200000
 ```
 
@@ -323,5 +343,11 @@ Completed refactors in this phase:
     fixes Dua Urdu bulk generation with `gemini-3.1-pro-preview`, which can take longer than
     Node's default five-minute response timeout for a long Urdu prompt plus inline PDF. Added
     `lib/geminiSse.ts`, `GEMINI_REQUEST_TIMEOUT_MS`, and focused streaming parser tests.
+22. Added `/ps-urdu` as a complete Dua Urdu-derived workflow with isolated page/API routes,
+    model selectors, prompt module, print-preview session namespace, and print component/styles.
+    Its prompt adapter intentionally matches Dua Urdu until the final prompt is supplied.
+23. Replaced the temporary PS Urdu print copy with the supplied Private Secretary Urdu template,
+    including its blue letterhead, addressee/body/footer mapping, editable HM date, print rules,
+    and Jameel/Kufi/Usman fonts from `public/fonts/`.
 
 The app is currently in a stable, extensible state aligned with these changes.
