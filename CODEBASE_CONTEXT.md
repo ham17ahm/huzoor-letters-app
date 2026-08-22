@@ -192,7 +192,7 @@ Generate Replies → review → print), with two amendments:
 - The four reply fields use Urdu labels, `lang="ur"`, RTL direction, and Google Amiri. All other
   controls remain English and LTR.
 - `lib/duaUrdu/prompts.ts` contains the replaceable provisional generation prompt.
-- `/dua-urdu/print` is a basic route-specific A4 preview pending the final print CSS/template.
+- `/dua-urdu/print` uses the dedicated Urdu A4 correspondence template and route-specific CSS.
 - Dua Urdu has independent `GEMINI_DUA_URDU_*` model environment variables.
 
 ### 1) Toolbar config

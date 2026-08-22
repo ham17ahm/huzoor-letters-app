@@ -72,8 +72,8 @@ DEBUG_GEMINI_REQUESTS=false
   Google Amiri; the rest of the application remains English and LTR.
 - Its current Generate Replies prompt is provisional and isolated in `lib/duaUrdu/prompts.ts`
   so the final supplied prompt can replace it without changing the workflow or API contract.
-- Its current `/dua-urdu/print` view is a deliberately basic A4 RTL preview with an isolated
-  stylesheet ready for the final print template.
+- Its `/dua-urdu/print` view uses the dedicated Urdu A4 correspondence template, with an editable
+  display date and an isolated print stylesheet.
 
 Model selection is intentionally route-specific:
 
