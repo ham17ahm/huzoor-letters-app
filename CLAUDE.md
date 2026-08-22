@@ -40,7 +40,9 @@ in an in-memory `pdfSession`, 2h TTL) → [enter notes — `/` only] → **Gener
   `<requested_letters>` payload. **Section bodies are interim placeholders — replace with the
   final PS prompt text when provided; the `build*` functions stay the same.**
 - `lib/validators.ts`, `lib/json.ts`, `lib/pageRanges.ts`, `lib/pdfSession.ts`,
-  `lib/gemini.ts` — pure/stable, shared by both routes.
+  `lib/gemini.ts` — shared Gemini transport using `streamGenerateContent` SSE and a configurable
+  long-running Undici dispatcher. `lib/geminiSse.ts` assembles streamed UTF-8 text for the
+  existing JSON parsers and validators.
 - Config-driven extension points: `lib/toolbarConfig.ts`, `lib/inquiryPhraseButtons.ts`,
   `lib/aiModelConfig.ts`, `lib/printConfig.ts`.
 
@@ -84,9 +86,14 @@ GEMINI_DETECT_PDF_MODEL=gemini-2.5-flash
 GEMINI_GENERATE_REPLIES_MODEL=gemini-2.5-flash
 GEMINI_PS_DETECT_PDF_MODEL=gemini-2.5-flash
 GEMINI_PS_GENERATE_REPLIES_MODEL=gemini-2.5-flash
+GEMINI_DUA_URDU_DETECT_PDF_MODEL=gemini-2.5-flash
+GEMINI_DUA_URDU_GENERATE_REPLIES_MODEL=gemini-2.5-flash
+GEMINI_REQUEST_TIMEOUT_MS=1200000
 DEBUG_GEMINI_REQUESTS=false
 ```
 
 `GEMINI_MODEL` is a fallback for any unset workflow-specific model, then the built-in default.
+`GEMINI_REQUEST_TIMEOUT_MS` is optional and defaults to a 20-minute response-header/chunk
+inactivity timeout. Browser aborts still cancel the upstream Gemini request immediately.
 `DEBUG_GEMINI_REQUESTS=true` logs full request bodies (incl. base64 PDF) and the constructed
 generate prompt — large and sensitive; keep off by default.

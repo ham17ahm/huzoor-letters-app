@@ -39,6 +39,17 @@ export function NoteFreeLetterFormCard({
   };
   const identityFieldOrder = config.identityFieldOrder ?? ['fullName', 'location'];
 
+  function labelClassName(
+    field: 'fullName' | 'location' | 'inquiry' | 'prayerSentence'
+  ): string | undefined {
+    return [
+      config.fieldClassName,
+      config.visuallyHiddenLabels?.includes(field) ? 'visuallyHidden' : undefined
+    ]
+      .filter(Boolean)
+      .join(' ') || undefined;
+  }
+
   useEffect(() => {
     setPagesInput(formatPageRange(letter.source_pages));
     setPagesError(null);
@@ -106,7 +117,11 @@ export function NoteFreeLetterFormCard({
         {identityFieldOrder.map((field) =>
           field === 'fullName' ? (
             <div key={field}>
-              <label htmlFor={`${letter.letter_id}-name`} {...localizedFieldProps}>
+              <label
+                htmlFor={`${letter.letter_id}-name`}
+                {...localizedFieldProps}
+                className={labelClassName('fullName')}
+              >
                 {config.labels.fullName}
               </label>
               <input
@@ -120,7 +135,11 @@ export function NoteFreeLetterFormCard({
             </div>
           ) : (
             <div key={field}>
-              <label htmlFor={`${letter.letter_id}-location`} {...localizedFieldProps}>
+              <label
+                htmlFor={`${letter.letter_id}-location`}
+                {...localizedFieldProps}
+                className={labelClassName('location')}
+              >
                 {config.labels.location}
               </label>
               <input
@@ -136,7 +155,11 @@ export function NoteFreeLetterFormCard({
         )}
 
         <div className="fieldFull">
-          <label htmlFor={`${letter.letter_id}-inquiry`} {...localizedFieldProps}>
+          <label
+            htmlFor={`${letter.letter_id}-inquiry`}
+            {...localizedFieldProps}
+            className={labelClassName('inquiry')}
+          >
             {config.labels.inquiry}
           </label>
           <div className="inquiryComposer">
@@ -166,7 +189,11 @@ export function NoteFreeLetterFormCard({
         </div>
 
         <div className="fieldFull">
-          <label htmlFor={`${letter.letter_id}-prayer`} {...localizedFieldProps}>
+          <label
+            htmlFor={`${letter.letter_id}-prayer`}
+            {...localizedFieldProps}
+            className={labelClassName('prayerSentence')}
+          >
             {config.labels.prayerSentence}
           </label>
           <textarea

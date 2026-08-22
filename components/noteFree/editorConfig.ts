@@ -14,6 +14,7 @@ export type NoteFreeEditorConfig = {
     prayerSentence: string;
   };
   inquiryPhraseButtons: readonly InquiryPhraseButton[];
+  visuallyHiddenLabels?: readonly ('fullName' | 'location' | 'inquiry' | 'prayerSentence')[];
   identityFieldOrder?: readonly ('fullName' | 'location')[];
   fieldLanguage?: string;
   fieldDirection?: 'ltr' | 'rtl';

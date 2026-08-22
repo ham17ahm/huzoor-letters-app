@@ -15,6 +15,10 @@ test('Dua Urdu editor config localizes only the four reply fields', () => {
   assert.equal(DUA_URDU_EDITOR_CONFIG.fieldLanguage, 'ur');
   assert.equal(DUA_URDU_EDITOR_CONFIG.fieldDirection, 'rtl');
   assert.equal(DUA_URDU_EDITOR_CONFIG.fieldClassName, 'duaUrduField');
+  assert.deepEqual(DUA_URDU_EDITOR_CONFIG.visuallyHiddenLabels, [
+    'inquiry',
+    'prayerSentence'
+  ]);
   assert.deepEqual(DUA_URDU_EDITOR_CONFIG.identityFieldOrder, ['location', 'fullName']);
 });
 

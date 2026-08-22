@@ -1,4 +1,13 @@
+import { Agent, fetch as undiciFetch } from 'undici';
+import { collectGeminiSseText } from '@/lib/geminiSse';
+
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
+const DEFAULT_GEMINI_REQUEST_TIMEOUT_MS = 20 * 60 * 1000;
+
+const geminiDispatcher = new Agent({
+  headersTimeout: getGeminiRequestTimeoutMs(),
+  bodyTimeout: getGeminiRequestTimeoutMs()
+});
 
 export function shouldLogGeminiRequests(): boolean {
   return process.env.DEBUG_GEMINI_REQUESTS === 'true';
@@ -42,45 +51,71 @@ export async function generateWithGeminiPdf(params: {
     console.log('[Gemini] generateContent request body:', JSON.stringify(requestBody, null, 2));
   }
 
-  const response = await fetch(`${GEMINI_BASE_URL}/${model}:generateContent`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-goog-api-key': apiKey
-    },
-    signal: params.signal,
-    body: JSON.stringify(requestBody)
-  });
-
-  const bodyText = await response.text();
+  let response;
+  try {
+    response = await undiciFetch(
+      `${GEMINI_BASE_URL}/${model}:streamGenerateContent?alt=sse`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey
+        },
+        dispatcher: geminiDispatcher,
+        signal: params.signal,
+        body: JSON.stringify(requestBody)
+      }
+    );
+  } catch (error) {
+    throw describeGeminiTransportError(error);
+  }
 
   if (!response.ok) {
+    const bodyText = await response.text();
     throw new Error(`Gemini request failed (${response.status}): ${bodyText}`);
   }
 
-  let body: GeminiResponse;
+  if (!response.body) {
+    throw new Error('Gemini returned a streaming response without a body.');
+  }
+
   try {
-    body = JSON.parse(bodyText) as GeminiResponse;
-  } catch {
-    throw new Error(`Gemini returned non-JSON response: ${bodyText}`);
+    return await collectGeminiSseText(response.body);
+  } catch (error) {
+    throw describeGeminiTransportError(error);
   }
-
-  const text = body.candidates?.[0]?.content?.parts
-    ?.map((part) => part.text || '')
-    .join('\n')
-    .trim();
-
-  if (!text) {
-    throw new Error(`Gemini returned an empty response: ${bodyText}`);
-  }
-
-  return text;
 }
 
-type GeminiResponse = {
-  candidates?: Array<{
-    content?: {
-      parts?: Array<{ text?: string }>;
-    };
-  }>;
-};
+function getGeminiRequestTimeoutMs(): number {
+  const configured = Number(process.env.GEMINI_REQUEST_TIMEOUT_MS);
+  return Number.isFinite(configured) && configured > 0
+    ? configured
+    : DEFAULT_GEMINI_REQUEST_TIMEOUT_MS;
+}
+
+function describeGeminiTransportError(error: unknown): Error {
+  if (error instanceof Error && error.name === 'AbortError') return error;
+
+  const code = findErrorCode(error);
+  if (code === 'UND_ERR_HEADERS_TIMEOUT' || code === 'UND_ERR_BODY_TIMEOUT') {
+    return new Error(
+      `Gemini did not send data within ${Math.round(
+        getGeminiRequestTimeoutMs() / 60000
+      )} minutes. The request may be too large or Gemini may be overloaded.`
+    );
+  }
+
+  return error instanceof Error ? error : new Error('Gemini request failed.');
+}
+
+function findErrorCode(error: unknown): string | undefined {
+  let current = error;
+
+  for (let depth = 0; depth < 5 && current && typeof current === 'object'; depth += 1) {
+    const value = current as { code?: unknown; cause?: unknown };
+    if (typeof value.code === 'string') return value.code;
+    current = value.cause;
+  }
+
+  return undefined;
+}

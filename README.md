@@ -60,10 +60,13 @@ GEMINI_PS_DETECT_PDF_MODEL=gemini-2.5-flash
 GEMINI_PS_GENERATE_REPLIES_MODEL=gemini-2.5-flash
 GEMINI_DUA_URDU_DETECT_PDF_MODEL=gemini-2.5-flash
 GEMINI_DUA_URDU_GENERATE_REPLIES_MODEL=gemini-2.5-flash
+GEMINI_REQUEST_TIMEOUT_MS=1200000
 DEBUG_GEMINI_REQUESTS=false
 ```
 
 `GEMINI_MODEL` is still supported as a fallback if any workflow-specific model is not set.
+`GEMINI_REQUEST_TIMEOUT_MS` is optional and defaults to 20 minutes of inactivity while waiting
+for Gemini response headers or streamed output.
 
 ## Dua Urdu workflow
 
@@ -84,6 +87,9 @@ Model selection is intentionally route-specific:
 ## Gemini request details
 
 - PDF detection and reply generation both send the PDF as inline base64 data to Gemini.
+- Gemini responses use the SSE `streamGenerateContent` endpoint internally, then are assembled
+  into one complete response before validation and return to the browser. This supports slower
+  Gemini Pro requests without changing the UI workflow.
 - Generate Replies builds its prompt in `buildGenerateRepliesPrompt` using each letter's `letter_id`, formatted `source_pages`, and user-entered `note`.
 - The Generate Replies prompt is structured with XML-style sections such as role, task, requested letters, note handling, field specifications, examples, edge cases, validation checklist, and output format.
 - `source_pages` is formatted by `formatPageRange` as strings like `5`, `1-3`, or `1, 3-4, 7`.

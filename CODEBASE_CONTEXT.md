@@ -80,7 +80,11 @@ There are three parallel workflows:
 ### Domain/Utility Layer
 
 - `lib/aiModelConfig.ts` — master AI model config and workflow-specific model selectors.
-- `lib/gemini.ts` — Gemini call implementation.
+- `lib/gemini.ts` — Gemini call implementation. Uses `streamGenerateContent` over SSE with a
+  route-scoped Undici dispatcher so long-running Gemini Pro PDF requests are not cut off by
+  Node's default five-minute header/body inactivity timeout.
+- `lib/geminiSse.ts` — incrementally decodes UTF-8 SSE chunks and assembles Gemini text deltas
+  into the same complete text response expected by the existing JSON parsers and validators.
 - `lib/prompts.ts` — boundary + reply prompt builders.
   - Generate Replies prompt uses XML-style sections for role, task, requested letters, note handling, field specifications, examples, edge cases, validation checklist, and output format.
 - `lib/validators.ts` — normalization of Gemini output.
@@ -238,15 +242,23 @@ GEMINI_DETECT_PDF_MODEL=gemini-2.5-flash
 GEMINI_GENERATE_REPLIES_MODEL=gemini-2.5-flash
 GEMINI_PS_DETECT_PDF_MODEL=gemini-2.5-flash
 GEMINI_PS_GENERATE_REPLIES_MODEL=gemini-2.5-flash
+GEMINI_DUA_URDU_DETECT_PDF_MODEL=gemini-2.5-flash
+GEMINI_DUA_URDU_GENERATE_REPLIES_MODEL=gemini-2.5-flash
+GEMINI_REQUEST_TIMEOUT_MS=1200000
 ```
 
 `GEMINI_MODEL` remains supported as a fallback if a workflow-specific variable is missing. If neither is set, `lib/aiModelConfig.ts` falls back to the built-in default model. The `GEMINI_PS_*` variables configure the `/ps` route independently and use the same fallback chain.
+
+`GEMINI_REQUEST_TIMEOUT_MS` is optional and defaults to 20 minutes. It controls inactivity
+while waiting for Gemini response headers or the next streamed response chunk; request aborts
+from the browser are still honored immediately. Gemini PDF calls stream internally, but API
+routes continue returning one assembled JSON response to the UI after generation completes.
 
 ### Gemini debug logging
 
 Gemini request logging is gated by `DEBUG_GEMINI_REQUESTS=true`.
 
-When enabled, `lib/gemini.ts` logs the full `generateContent` request body before calling Gemini. This includes the full base64 PDF and prompt, so logs can be large and may contain sensitive document data. `app/api/generate-replies/route.ts` also logs the final constructed Generate Replies prompt text.
+When enabled, `lib/gemini.ts` logs the full `streamGenerateContent` request body before calling Gemini. This includes the full base64 PDF and prompt, so logs can be large and may contain sensitive document data. `app/api/generate-replies/route.ts` also logs the final constructed Generate Replies prompt text.
 
 ### Dev/build artifact isolation (critical)
 
@@ -306,5 +318,10 @@ Completed refactors in this phase:
 18. Replaced the PS print with a distinct Private Secretary letterhead template (`lib/ps/printDocument.ts`, `openPsPrintPreview`) that opens a popup and writes a self-contained HTML/CSS document. Removed the earlier route-based PS print (`app/ps/print/*`, `components/ps/PsPrintPreview.tsx`, `lib/ps/printPreviewSession.ts`). New `public/` assets are required: `/fonts/Adobe Naskh Medium.ttf` and `/img/SignPS_English.png`.
 19. Authored the real PS generate prompt (inquiry now a two-sentence "Huzoor Anwar (may Allah be his Helper) has received your letter … Following the perusal …" format) and forked reply normalization into `lib/ps/validators.ts` so the shared `normalizeReply` no longer corrupts the PS inquiry by forcing the standard "I have received your letter" prefix. Added `tests/psValidators.test.ts`.
 20. Hardening pass: moved dev output to the sibling `.next-dev` (was nested `.next/dev`) so `next build` can no longer wipe a running dev server — updated `next.config.ts`, `.gitignore`, `eslint.config.mjs`, `tsconfig.json`, `tsconfig.test.json`. Pinned `<base href="${origin}/">` in the PS print popup (`lib/ps/printDocument.ts`) so root-relative font/image URLs always resolve. Verified `.next-dev` survives a build and that the configured Gemini model ids (`gemini-3.1-pro-preview`, `gemini-2.5-flash`) exist via ListModels.
+21. Replaced buffered Gemini `generateContent` calls with `streamGenerateContent` SSE assembly and
+    added a dedicated Undici dispatcher with a configurable 20-minute inactivity timeout. This
+    fixes Dua Urdu bulk generation with `gemini-3.1-pro-preview`, which can take longer than
+    Node's default five-minute response timeout for a long Urdu prompt plus inline PDF. Added
+    `lib/geminiSse.ts`, `GEMINI_REQUEST_TIMEOUT_MS`, and focused streaming parser tests.
 
 The app is currently in a stable, extensible state aligned with these changes.

@@ -37,6 +37,7 @@ export const DUA_URDU_EDITOR_CONFIG: NoteFreeEditorConfig = {
     prayerSentence: 'Gemini مکمل کرے گا'
   },
   inquiryPhraseButtons: DUA_URDU_INQUIRY_PHRASE_BUTTONS,
+  visuallyHiddenLabels: ['inquiry', 'prayerSentence'],
   identityFieldOrder: ['location', 'fullName'],
   fieldLanguage: 'ur',
   fieldDirection: 'rtl',
