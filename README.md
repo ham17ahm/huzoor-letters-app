@@ -84,8 +84,8 @@ for Gemini response headers or streamed output.
 
 - `/ps-urdu` is a functional duplicate of Dua Urdu with independent API routes, model selectors,
   prompt seam, print-preview session, and print component/styles.
-- Its temporary `lib/psUrdu/prompts.ts` adapter uses the current Dua Urdu prompt verbatim. Replace
-  that module when the final PS Urdu prompt is supplied.
+- Its dedicated `lib/psUrdu/prompts.ts` implements the PS Urdu two-sentence inquiry style:
+  acknowledgment to Huzoor Anwar followed by the fixed post-perusal prayer sentence.
 - Its `/ps-urdu/print` view uses the supplied Private Secretary Urdu letterhead, isolated under
   `components/ps-urdu/`. It uses the Jameel, Hasan Hiba (Kufi), and Usman font files in
   `public/fonts/`.

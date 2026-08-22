@@ -41,8 +41,10 @@ in an in-memory `pdfSession`, 2h TTL) → [enter notes — `/` only] → **Gener
   `<requested_letters>` payload. **Section bodies are interim placeholders — replace with the
   final PS prompt text when provided; the `build*` functions stay the same.**
 - `lib/duaUrdu/prompts.ts` — current Dua Urdu prompt implementation.
-- `lib/psUrdu/prompts.ts` — PS Urdu prompt seam; currently delegates verbatim to Dua Urdu and is
-  the only prompt module to replace when the final PS Urdu prompt is provided.
+- `lib/psUrdu/prompts.ts` — dedicated PS Urdu prompt with runtime requested-page injection and the
+  required two-sentence Huzoor Anwar acknowledgment/post-perusal inquiry style.
+- `lib/psUrdu/validators.ts` — PS Urdu-specific normalization. It must not reuse the Dua Urdu
+  normalizer because that enforces the incompatible `آپ کا خط ملا` prefix.
 - `components/ps-urdu/PsUrduPrintPreview.tsx` and its CSS module — isolated supplied Private
   Secretary Urdu print template. It maps full name, inquiry/prayer paragraphs, location, and an
   editable date, and uses the Jameel, Hasan Hiba (Kufi), and Usman fonts in `public/fonts/`.

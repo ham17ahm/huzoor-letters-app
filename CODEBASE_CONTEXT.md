@@ -18,7 +18,7 @@ There are four parallel workflows:
   prompt, validation, model configuration, RTL field presentation, and print view isolated.
 - `/ps-urdu` — a duplicate of Dua Urdu with independent route/API paths, model selectors, prompt
   seam, print session, and print component/styles. Its supplied Private Secretary Urdu print
-  design is implemented; its prompt temporarily matches Dua Urdu until the final prompt arrives.
+  design and dedicated PS Urdu generation prompt are implemented.
 
 ---
 
@@ -206,8 +206,12 @@ Generate Replies → review → print), with two amendments:
 
 - `/ps-urdu` and `/api/ps-urdu/*` reuse the generic note-free workflow and Dua Urdu editor/
   validation behavior.
-- `lib/psUrdu/prompts.ts` is the dedicated replacement seam. It temporarily delegates to the
-  current Dua Urdu prompt so behavior is identical until the final prompt is provided.
+- `lib/psUrdu/prompts.ts` contains the dedicated PS Urdu generation prompt. It requires inquiry
+  to begin with the Huzoor Anwar acknowledgment and end with the fixed "بعد ملاحظہ…" sentence,
+  injects requested page ranges at runtime, and contains its own examples, compression rules,
+  field rules, constraints, and JSON output contract.
+- `lib/psUrdu/validators.ts` recognizes the PS Urdu inquiry prefix independently. Do not route PS
+  Urdu through `normalizeDuaUrduReply`, which would prepend the incompatible `آپ کا خط ملا` text.
 - `/ps-urdu/print`, `components/ps-urdu/PsUrduPrintPreview.tsx`, and its CSS module form a fully
   separate print path implementing the supplied blue Private Secretary Urdu letterhead. It uses
   `/fonts/Jameel Noori Nastaleeq.ttf`, `/fonts/ArbFONTS-Hasan_Hiba.ttf`, and
@@ -345,9 +349,11 @@ Completed refactors in this phase:
     `lib/geminiSse.ts`, `GEMINI_REQUEST_TIMEOUT_MS`, and focused streaming parser tests.
 22. Added `/ps-urdu` as a complete Dua Urdu-derived workflow with isolated page/API routes,
     model selectors, prompt module, print-preview session namespace, and print component/styles.
-    Its prompt adapter intentionally matches Dua Urdu until the final prompt is supplied.
 23. Replaced the temporary PS Urdu print copy with the supplied Private Secretary Urdu template,
     including its blue letterhead, addressee/body/footer mapping, editable HM date, print rules,
     and Jameel/Kufi/Usman fonts from `public/fonts/`.
+24. Implemented the final dedicated PS Urdu generation prompt with runtime page injection,
+    two-sentence Huzoor Anwar inquiry rules, examples, compression guidance, constraints, and JSON
+    contract. Forked PS Urdu reply normalization so the Dua Urdu inquiry prefix cannot corrupt it.
 
 The app is currently in a stable, extensible state aligned with these changes.
