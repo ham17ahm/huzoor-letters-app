@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { NoteFreeEditorConfig } from '@/components/noteFree/editorConfig';
+import { applyNameAffix } from '@/lib/nameAffixes';
 import { formatPageRange, parsePageRange } from '@/lib/pageRanges';
 import { appendPhrase } from '@/lib/textInsertion';
 import type { NoteFreeLetterRecord } from '@/types/noteFree';
@@ -69,6 +70,18 @@ export function NoteFreeLetterFormCard({
   function insertInquiryPhrase(phrase: string) {
     update({ inquiry: appendPhrase(letter.inquiry, phrase) });
   }
+
+  function formatFullName(buttonIndex: number) {
+    const buttons = config.fullNameAffixButtons ?? [];
+    const selected = buttons[buttonIndex];
+    if (!selected) return;
+
+    update({ full_name: applyNameAffix(letter.full_name, selected, buttons) });
+  }
+
+  const hasEditorActionButtons = Boolean(
+    config.inquiryPhraseButtons.length || config.fullNameAffixButtons?.length
+  );
 
   return (
     <section className="letterCard">
@@ -162,7 +175,7 @@ export function NoteFreeLetterFormCard({
           >
             {config.labels.inquiry}
           </label>
-          <div className="inquiryComposer">
+          <div className={hasEditorActionButtons ? 'inquiryComposer' : undefined}>
             <textarea
               id={`${letter.letter_id}-inquiry`}
               value={letter.inquiry}
@@ -171,20 +184,34 @@ export function NoteFreeLetterFormCard({
               placeholder={config.placeholders.inquiry}
               {...localizedFieldProps}
             />
-            <div className="inquiryPhraseButtons" aria-label="Insert inquiry phrases">
-              {config.inquiryPhraseButtons.map((button) => (
-                <button
-                  key={button.id}
-                  type="button"
-                  className="inquiryPhraseButton"
-                  disabled={disabled}
-                  onClick={() => insertInquiryPhrase(button.phrase)}
-                  title={button.phrase}
-                >
-                  {button.label}
-                </button>
-              ))}
-            </div>
+            {hasEditorActionButtons ? (
+              <div className="inquiryPhraseButtons" aria-label="Editor actions">
+                {config.inquiryPhraseButtons.map((button) => (
+                  <button
+                    key={button.id}
+                    type="button"
+                    className="inquiryPhraseButton"
+                    disabled={disabled}
+                    onClick={() => insertInquiryPhrase(button.phrase)}
+                    title={button.phrase}
+                  >
+                    {button.label}
+                  </button>
+                ))}
+                {config.fullNameAffixButtons?.map((button, buttonIndex) => (
+                  <button
+                    key={button.id}
+                    type="button"
+                    className="inquiryPhraseButton"
+                    disabled={disabled}
+                    onClick={() => formatFullName(buttonIndex)}
+                    title={`${button.prefix} … ${button.suffix}`}
+                  >
+                    {button.label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
         </div>
 

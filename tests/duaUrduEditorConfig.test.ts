@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   DUA_URDU_EDITOR_CONFIG,
-  DUA_URDU_INQUIRY_PHRASE_BUTTONS
+  DUA_URDU_NAME_AFFIX_BUTTONS
 } from '../lib/duaUrdu/editorConfig.js';
 
 test('Dua Urdu editor config localizes only the four reply fields', () => {
@@ -22,11 +22,14 @@ test('Dua Urdu editor config localizes only the four reply fields', () => {
   assert.deepEqual(DUA_URDU_EDITOR_CONFIG.identityFieldOrder, ['location', 'fullName']);
 });
 
-test('Dua Urdu inquiry helpers retain English labels and insert Urdu phrases', () => {
+test('Dua Urdu provides only male and female full-name honorific buttons', () => {
+  assert.deepEqual(DUA_URDU_EDITOR_CONFIG.inquiryPhraseButtons, []);
   assert.deepEqual(
-    DUA_URDU_INQUIRY_PHRASE_BUTTONS.map((button) => button.label),
-    ['Hadiyah', 'Gift', 'Condolences', 'Inna Lillah']
+    DUA_URDU_NAME_AFFIX_BUTTONS,
+    [
+      { id: 'male', label: 'Male', prefix: 'مکرم', suffix: 'صاحب' },
+      { id: 'female', label: 'Female', prefix: 'مکرمہ', suffix: 'صاحبہ' }
+    ]
   );
-  assert.match(DUA_URDU_INQUIRY_PHRASE_BUTTONS[0].phrase, /[\u0600-\u06ff]/u);
-  assert.match(DUA_URDU_INQUIRY_PHRASE_BUTTONS[3].phrase, /إِنَّا لِلَّٰهِ/u);
+  assert.equal(DUA_URDU_EDITOR_CONFIG.fullNameAffixButtons, DUA_URDU_NAME_AFFIX_BUTTONS);
 });

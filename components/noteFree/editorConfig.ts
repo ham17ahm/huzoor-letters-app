@@ -1,4 +1,5 @@
 import type { InquiryPhraseButton } from '@/lib/inquiryPhraseButtons';
+import type { NameAffixButton } from '@/lib/nameAffixes';
 
 export type NoteFreeEditorConfig = {
   labels: {
@@ -14,6 +15,7 @@ export type NoteFreeEditorConfig = {
     prayerSentence: string;
   };
   inquiryPhraseButtons: readonly InquiryPhraseButton[];
+  fullNameAffixButtons?: readonly NameAffixButton[];
   visuallyHiddenLabels?: readonly ('fullName' | 'location' | 'inquiry' | 'prayerSentence')[];
   identityFieldOrder?: readonly ('fullName' | 'location')[];
   fieldLanguage?: string;
