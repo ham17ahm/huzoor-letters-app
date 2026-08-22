@@ -355,5 +355,8 @@ Completed refactors in this phase:
 24. Implemented the final dedicated PS Urdu generation prompt with runtime page injection,
     two-sentence Huzoor Anwar inquiry rules, examples, compression guidance, constraints, and JSON
     contract. Forked PS Urdu reply normalization so the Dua Urdu inquiry prefix cannot corrupt it.
+25. Corrected the Dua Urdu XML prompt composer so tagged sections are emitted exactly once,
+    `<constraints>` is included, and only the runtime requested-letter/page payload is sent.
+    Updated the prompt regression test to guard against duplicate wrappers and placeholder leakage.
 
 The app is currently in a stable, extensible state aligned with these changes.

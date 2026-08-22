@@ -310,19 +310,24 @@ export function buildDuaUrduAnalyzePdfPrompt(): string {
 export function buildDuaUrduGenerateRepliesPrompt(
   letters: DuaUrduLetterRecord[],
 ): string {
-  const requestedLetters = letters.map((letter) => ({
+  return [
+    GENERATE_SECTIONS.role,
+    GENERATE_SECTIONS.task,
+    buildRequestedLettersSection(letters),
+    GENERATE_SECTIONS.examples,
+    GENERATE_SECTIONS.compressionExamples,
+    GENERATE_SECTIONS.fieldRules,
+    GENERATE_SECTIONS.styleRules,
+    GENERATE_SECTIONS.constraints,
+    GENERATE_SECTIONS.outputFormat,
+  ].join("\n\n");
+}
+
+function buildRequestedLettersSection(letters: DuaUrduLetterRecord[]): string {
+  const payload = letters.map((letter) => ({
     letter_id: letter.letter_id,
     source_pages: formatPageRange(letter.source_pages),
   }));
 
-  return [
-    `<role>\n${GENERATE_SECTIONS.role}\n</role>`,
-    `<task>\n${GENERATE_SECTIONS.task}\n</task>`,
-    `<requested_letters>\n${JSON.stringify(requestedLetters, null, 2)}\n</requested_letters>`,
-    GENERATE_SECTIONS.fieldRules,
-    GENERATE_SECTIONS.styleRules,
-    GENERATE_SECTIONS.compressionExamples,
-    GENERATE_SECTIONS.examples,
-    GENERATE_SECTIONS.outputFormat,
-  ].join("\n\n");
+  return `<requested_letters>\n${JSON.stringify(payload, null, 2)}\n</requested_letters>`;
 }

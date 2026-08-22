@@ -40,7 +40,9 @@ in an in-memory `pdfSession`, 2h TTL) → [enter notes — `/` only] → **Gener
   build time. Edit one section in isolation; the only dynamic piece is the injected
   `<requested_letters>` payload. **Section bodies are interim placeholders — replace with the
   final PS prompt text when provided; the `build*` functions stay the same.**
-- `lib/duaUrdu/prompts.ts` — current Dua Urdu prompt implementation.
+- `lib/duaUrdu/prompts.ts` — XML-section Dua Urdu prompt with runtime requested-page injection.
+  Compose the stored sections directly: do not wrap tagged `role`/`task` sections again, omit
+  `<constraints>`, or include the static `requestedLetters` example in the runtime prompt.
 - `lib/psUrdu/prompts.ts` — dedicated PS Urdu prompt with runtime requested-page injection and the
   required two-sentence Huzoor Anwar acknowledgment/post-perusal inquiry style.
 - `lib/psUrdu/validators.ts` — PS Urdu-specific normalization. It must not reuse the Dua Urdu
