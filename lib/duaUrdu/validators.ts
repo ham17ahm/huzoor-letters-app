@@ -4,17 +4,42 @@ import type {
   DuaUrduGenerateReplyResult
 } from '@/types/duaUrdu';
 
+const INQUIRY_PREFIX = 'آپ کا خط ملا';
+const AMIN_VARIANTS_RE = /(?:آمین|آمین)/u;
+
 export function normalizeDuaUrduReply(value: unknown): DuaUrduGenerateReplyResult {
   if (!value || typeof value !== 'object') {
     throw new Error('Gemini did not return a JSON object for the reply.');
   }
 
   const obj = value as Record<string, unknown>;
+  const fullName = cleanText(obj.full_name, 'N/A');
+  const location = cleanText(obj.location, 'N/A');
+  let inquiry = cleanText(obj.inquiry, '');
+  let prayer = cleanText(obj.prayer_sentence, '');
+
+  if (!inquiry) {
+    throw new Error('Gemini returned an empty inquiry.');
+  }
+  if (!prayer) {
+    throw new Error('Gemini returned an empty prayer_sentence.');
+  }
+
+  if (!inquiry.startsWith(INQUIRY_PREFIX)) {
+    inquiry = `${INQUIRY_PREFIX} ${inquiry}`.trim();
+  }
+
+  // Treat common Unicode spellings of Amin permissively. Append the requested
+  // form only when no Amin is present, avoiding rigid rewrites and duplicates.
+  if (!AMIN_VARIANTS_RE.test(prayer)) {
+    prayer = `${prayer.replace(/\s+$/u, '')} آمین`;
+  }
+
   return {
-    full_name: cleanText(obj.full_name, 'دستیاب نہیں'),
-    location: cleanText(obj.location, 'دستیاب نہیں'),
-    inquiry: cleanText(obj.inquiry, ''),
-    prayer_sentence: cleanText(obj.prayer_sentence, '')
+    full_name: fullName,
+    location,
+    inquiry,
+    prayer_sentence: prayer
   };
 }
 

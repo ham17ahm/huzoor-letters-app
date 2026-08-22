@@ -25,6 +25,13 @@ test('Dua Urdu generation prompt preserves ids, formats pages, and requests Urdu
   assert.match(prompt, /"location"/);
   assert.match(prompt, /"inquiry"/);
   assert.match(prompt, /"prayer_sentence"/);
+  assert.match(prompt, /<style_rules>/);
+  assert.match(prompt, /<compression_examples>/);
+  assert.match(prompt, /<examples>/);
+  assert.match(prompt, /\[Dream — good\]/);
+  assert.match(prompt, /closely follows the linguistic style/);
+  assert.match(prompt, /absolute maximum of 6/);
+  assert.match(prompt, /use "N\/A" when unavailable/);
   assert.doesNotMatch(prompt, /"note"/);
 });
 

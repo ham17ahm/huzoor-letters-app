@@ -191,7 +191,7 @@ Generate Replies → review → print), with two amendments:
   `/ps`; Standard remains independent because it requires notes and processors.
 - The four reply fields use Urdu labels, `lang="ur"`, RTL direction, and Google Amiri. All other
   controls remain English and LTR.
-- `lib/duaUrdu/prompts.ts` contains the replaceable provisional generation prompt.
+- `lib/duaUrdu/prompts.ts` contains the route-specific Urdu generation rules and examples.
 - `/dua-urdu/print` uses the dedicated Urdu A4 correspondence template and route-specific CSS.
 - Dua Urdu has independent `GEMINI_DUA_URDU_*` model environment variables.
 

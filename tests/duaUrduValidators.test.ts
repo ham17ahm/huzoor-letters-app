@@ -9,37 +9,50 @@ test('normalizeDuaUrduReply preserves Urdu fields and normalizes whitespace', ()
   const result = normalizeDuaUrduReply({
     full_name: '  احمد   خان ',
     location: ' لندن، برطانیہ ',
-    inquiry: 'آپ کا خط موصول ہوا۔',
+    inquiry: 'آپ کا خط ملا۔',
     prayer_sentence: 'اللہ تعالیٰ آپ کو کامیابی عطا فرمائے۔ آمین۔'
   });
 
   assert.deepEqual(result, {
     full_name: 'احمد خان',
     location: 'لندن، برطانیہ',
-    inquiry: 'آپ کا خط موصول ہوا۔',
+    inquiry: 'آپ کا خط ملا۔',
     prayer_sentence: 'اللہ تعالیٰ آپ کو کامیابی عطا فرمائے۔ آمین۔'
   });
 });
 
-test('normalizeDuaUrduReply accepts Latin-script text for operator review', () => {
+test('normalizeDuaUrduReply corrects required boundaries without rigid Amin rewriting', () => {
   const result = normalizeDuaUrduReply({
     full_name: 'Ahmad Khan',
     location: 'London, UK',
     inquiry: 'Your letter was received.',
-    prayer_sentence: 'May Allah bless you.'
+    prayer_sentence: 'May Allah bless you. آمین'
   });
 
   assert.equal(result.full_name, 'Ahmad Khan');
-  assert.equal(result.inquiry, 'Your letter was received.');
+  assert.equal(result.inquiry, 'آپ کا خط ملا Your letter was received.');
+  assert.equal(result.prayer_sentence, 'May Allah bless you. آمین');
 });
 
 test('normalizeDuaUrduReply uses safe missing-field defaults', () => {
-  const result = normalizeDuaUrduReply({});
+  const result = normalizeDuaUrduReply({
+    inquiry: 'آپ کا خط ملا۔',
+    prayer_sentence: 'اللہ تعالیٰ فضل فرمائے۔ آمین'
+  });
 
-  assert.equal(result.full_name, 'دستیاب نہیں');
-  assert.equal(result.location, 'دستیاب نہیں');
-  assert.equal(result.inquiry, '');
-  assert.equal(result.prayer_sentence, '');
+  assert.equal(result.full_name, 'N/A');
+  assert.equal(result.location, 'N/A');
+});
+
+test('normalizeDuaUrduReply appends Amin when absent and rejects empty reply fields', () => {
+  const result = normalizeDuaUrduReply({
+    inquiry: 'آپ کا خط ملا۔',
+    prayer_sentence: 'اللہ تعالیٰ فضل فرمائے۔'
+  });
+
+  assert.equal(result.prayer_sentence, 'اللہ تعالیٰ فضل فرمائے۔ آمین');
+  assert.throws(() => normalizeDuaUrduReply({ inquiry: '', prayer_sentence: 'دعا' }));
+  assert.throws(() => normalizeDuaUrduReply({ inquiry: 'آپ کا خط ملا۔', prayer_sentence: '' }));
 });
 
 test('normalizeDuaUrduBulkReplies validates completeness and unique requested ids', () => {

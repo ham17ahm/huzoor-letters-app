@@ -70,8 +70,8 @@ DEBUG_GEMINI_REQUESTS=false
 - Uses the same note-free upload, boundary review, bulk generation, and editing flow as PS.
 - Only Full Name, Location, Inquiry, and Prayer sentence are localized, RTL, and rendered in
   Google Amiri; the rest of the application remains English and LTR.
-- Its current Generate Replies prompt is provisional and isolated in `lib/duaUrdu/prompts.ts`
-  so the final supplied prompt can replace it without changing the workflow or API contract.
+- Its Generate Replies prompt is isolated in `lib/duaUrdu/prompts.ts` so its detailed Urdu
+  correspondence rules and examples can evolve without changing the workflow or API contract.
 - Its `/dua-urdu/print` view uses the dedicated Urdu A4 correspondence template, with an editable
   display date and an isolated print stylesheet.
 
