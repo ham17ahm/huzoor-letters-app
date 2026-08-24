@@ -152,7 +152,23 @@
   text-align: center;
   font-size: 18pt;
   font-family: Jameel, serif;
-  margin-bottom: 17mm;
+}
+
+.signatureImageSlot {
+  position: relative;
+  width: 38mm;
+  height: 17mm;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.signatureImage {
+  position: absolute;
+  top: -12.4mm;
+  left: 50%;
+  width: 58mm;
+  height: auto;
+  transform: translateX(-50%);
 }
 
 .signatureTitle {

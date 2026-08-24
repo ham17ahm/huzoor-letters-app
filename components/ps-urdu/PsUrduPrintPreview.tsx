@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 import styles from '@/components/ps-urdu/PsUrduPrintPreview.module.css';
 import type { PsUrduLetterRecord } from '@/types/psUrdu';
@@ -94,6 +95,15 @@ function PsUrduLetter({
 
         <div className={styles.wassalam}>والسلام</div>
         <div className={styles.greetingEnd}>خاکسار</div>
+        <div className={styles.signatureImageSlot}>
+          <Image
+            className={styles.signatureImage}
+            src="/img/SignPS_Urdu.png"
+            alt="Private Secretary signature"
+            width={800}
+            height={600}
+          />
+        </div>
         <div className={styles.signatureTitle}>پرائیویٹ سیکرٹری</div>
       </div>
 
