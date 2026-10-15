@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getGenerateRepliesModel } from '@/lib/aiModelConfig';
+import { parseEngine, resolveArgonEngine } from '@/lib/argonEngine';
 import { generateWithGeminiPdf, shouldLogGeminiRequests } from '@/lib/gemini';
 import { parseJsonFromText } from '@/lib/json';
 import { buildGenerateRepliesPrompt } from '@/lib/prompts';
@@ -39,6 +40,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: `Missing note for ${missingNote.letter_id}.` }, { status: 400 });
     }
 
+    const engine = parseEngine(formData.get('engine'));
+    if (engine === null) {
+      return NextResponse.json({ error: 'Unknown generation engine.' }, { status: 400 });
+    }
+    const argon = engine ? resolveArgonEngine(engine) : null;
+
     const prompt = buildGenerateRepliesPrompt(letters);
     if (shouldLogGeminiRequests()) {
       console.log('[Gemini][generate-replies] Final constructed prompt:\n', prompt);
@@ -48,7 +55,8 @@ export async function POST(request: Request) {
     const rawText = await generateWithGeminiPdf({
       pdfBase64,
       prompt,
-      model: getGenerateRepliesModel(),
+      model: argon?.model ?? getGenerateRepliesModel(),
+      thinkingLevel: argon?.thinkingLevel,
       signal: request.signal
     });
 

@@ -1,5 +1,6 @@
 import { Agent, fetch as undiciFetch } from 'undici';
 import { collectGeminiSseText } from '@/lib/geminiSse';
+import { buildGenerationConfig, type GeminiThinkingLevel } from '@/lib/geminiGenerationConfig';
 
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 const DEFAULT_GEMINI_REQUEST_TIMEOUT_MS = 20 * 60 * 1000;
@@ -17,6 +18,7 @@ export async function generateWithGeminiPdf(params: {
   pdfBase64: string;
   prompt: string;
   model: string;
+  thinkingLevel?: GeminiThinkingLevel;
   signal?: AbortSignal;
 }): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -41,10 +43,7 @@ export async function generateWithGeminiPdf(params: {
         ]
       }
     ],
-    generationConfig: {
-      mediaResolution: 'MEDIA_RESOLUTION_HIGH',
-      temperature: 0.1
-    }
+    generationConfig: buildGenerationConfig(params.thinkingLevel)
   };
 
   if (shouldLogGeminiRequests()) {
@@ -72,6 +71,12 @@ export async function generateWithGeminiPdf(params: {
 
   if (!response.ok) {
     const bodyText = await response.text();
+    // A thinking level is only sent for Argon requests; give a clear message when the key lacks access.
+    if (params.thinkingLevel && (response.status === 403 || response.status === 404)) {
+      throw new Error(
+        `Argon 4 (${model}) isn't available for this API key (${response.status}). It may require paid-tier or partner access. Details: ${bodyText}`
+      );
+    }
     throw new Error(`Gemini request failed (${response.status}): ${bodyText}`);
   }
 

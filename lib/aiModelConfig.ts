@@ -32,6 +32,11 @@ export const AI_MODEL_CONFIG = {
     defaultModel: 'gemini-2.5-flash',
     envVar: 'GEMINI_PS_URDU_GENERATE_REPLIES_MODEL'
   },
+  // Gemini 4 Argon, used only by the "Argon 4" generate buttons on every route.
+  argonGenerateReplies: {
+    defaultModel: 'gemini-4-argon',
+    envVar: 'GEMINI_ARGON_MODEL'
+  },
   fallbackEnvVar: 'GEMINI_MODEL'
 } as const;
 
@@ -70,6 +75,14 @@ export function getPsUrduGenerateRepliesModel(): string {
   return getConfiguredModel(
     AI_MODEL_CONFIG.psUrduGenerateReplies,
     process.env[AI_MODEL_CONFIG.duaUrduGenerateReplies.envVar]
+  );
+}
+
+// Intentionally ignores GEMINI_MODEL so the Argon buttons can never silently run another model.
+export function getArgonModel(): string {
+  return (
+    process.env[AI_MODEL_CONFIG.argonGenerateReplies.envVar] ||
+    AI_MODEL_CONFIG.argonGenerateReplies.defaultModel
   );
 }
 

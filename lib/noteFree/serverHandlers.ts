@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { parseEngine, resolveArgonEngine } from '@/lib/argonEngine';
 import { generateWithGeminiPdf, shouldLogGeminiRequests } from '@/lib/gemini';
 import { parseJsonFromText } from '@/lib/json';
 import { createPdfSession, getPdfSession } from '@/lib/pdfSession';
@@ -89,6 +90,12 @@ export async function handleNoteFreeGenerateReplies(request: Request, config: Ge
       return NextResponse.json({ error: 'Missing letters to process.' }, { status: 400 });
     }
 
+    const engine = parseEngine(formData.get('engine'));
+    if (engine === null) {
+      return NextResponse.json({ error: 'Unknown generation engine.' }, { status: 400 });
+    }
+    const argon = engine ? resolveArgonEngine(engine) : null;
+
     const prompt = config.buildPrompt(letters);
     if (shouldLogGeminiRequests()) {
       console.log(`[Gemini][${config.debugLabel}] Final constructed prompt:\n`, prompt);
@@ -98,7 +105,8 @@ export async function handleNoteFreeGenerateReplies(request: Request, config: Ge
     const rawText = await generateWithGeminiPdf({
       pdfBase64,
       prompt,
-      model: config.model,
+      model: argon?.model ?? config.model,
+      thinkingLevel: argon?.thinkingLevel,
       signal: request.signal
     });
 

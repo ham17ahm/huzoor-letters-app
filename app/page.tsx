@@ -14,6 +14,8 @@ export default function Home() {
   const disabledById: Record<ToolbarActionId, boolean> = {
     analyze: !workflow.hasPdf || workflow.isBusy,
     generate: !workflow.hasPdf || !workflow.hasLetters || workflow.isBusy,
+    argonMedium: !workflow.hasPdf || !workflow.hasLetters || workflow.isBusy,
+    argonHigh: !workflow.hasPdf || !workflow.hasLetters || workflow.isBusy,
     print: !workflow.hasLetters || workflow.isBusy,
     reset: workflow.isBusy
   };
@@ -21,6 +23,8 @@ export default function Home() {
   const handlerById: Record<ToolbarActionId, () => void> = {
     analyze: () => void workflow.analyzePdf(),
     generate: () => void workflow.generateReplies(),
+    argonMedium: () => void workflow.generateReplies('argon-medium'),
+    argonHigh: () => void workflow.generateReplies('argon-high'),
     print: () => openPrintPreviewTab(workflow.letters),
     reset: workflow.resetAll
   };

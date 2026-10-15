@@ -54,6 +54,15 @@ in an in-memory `pdfSession`, 2h TTL) → [enter notes — `/` only] → **Gener
   `lib/gemini.ts` — shared Gemini transport using `streamGenerateContent` SSE and a configurable
   long-running Undici dispatcher. `lib/geminiSse.ts` assembles streamed UTF-8 text for the
   existing JSON parsers and validators.
+- **Argon 4 buttons** (`Argon 4 Medium` / `Argon 4 High`, teal `.argonButton`, all four routes) run
+  the *same* bulk generate flow on `gemini-4-argon` with `thinkingLevel` medium/high. The client
+  sends an optional `engine` form field (`'argon-medium' | 'argon-high'`); the generate handlers
+  (`lib/noteFree/serverHandlers.ts`, `app/api/generate-replies/route.ts`) resolve it through
+  `lib/argonEngine.ts`. No `engine` = unchanged behavior. Detect PDF never uses Argon. Model comes
+  from `GEMINI_ARGON_MODEL` (default `gemini-4-argon`) and deliberately ignores `GEMINI_MODEL`.
+  `lib/geminiGenerationConfig.ts` omits `temperature` for Argon (it ignores sampling params).
+  A 403/404 on an Argon call surfaces a clear "isn't available for this API key" error — no
+  silent fallback to Flash.
 - Config-driven extension points: `lib/toolbarConfig.ts`, `lib/inquiryPhraseButtons.ts`,
   `lib/aiModelConfig.ts`, `lib/printConfig.ts`.
 
@@ -101,6 +110,7 @@ GEMINI_DUA_URDU_DETECT_PDF_MODEL=gemini-2.5-flash
 GEMINI_DUA_URDU_GENERATE_REPLIES_MODEL=gemini-2.5-flash
 GEMINI_PS_URDU_DETECT_PDF_MODEL=gemini-2.5-flash
 GEMINI_PS_URDU_GENERATE_REPLIES_MODEL=gemini-2.5-flash
+GEMINI_ARGON_MODEL=gemini-4-argon
 GEMINI_REQUEST_TIMEOUT_MS=1200000
 DEBUG_GEMINI_REQUESTS=false
 ```

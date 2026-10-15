@@ -359,4 +359,14 @@ Completed refactors in this phase:
     `<constraints>` is included, and only the runtime requested-letter/page payload is sent.
     Updated the prompt regression test to guard against duplicate wrappers and placeholder leakage.
 
+26. Added **Argon 4 Medium / High** toolbar buttons (teal `.argonButton`) on all four routes. They
+    reuse the entire bulk Generate Replies mechanic but send an optional `engine` form field
+    (`argon-medium` | `argon-high`) that makes the generate handlers call `gemini-4-argon` with
+    `thinkingConfig.thinkingLevel` medium/high and no `temperature` (Argon ignores sampling params).
+    New files: `lib/argonEngine.ts`, `lib/geminiGenerationConfig.ts`, `tests/argonEngine.test.ts`.
+    Config: `GEMINI_ARGON_MODEL` (default `gemini-4-argon`, never falls back to `GEMINI_MODEL`).
+    Detect PDF and the original Generate Replies button are unchanged. Streaming SSE and
+    `mediaResolution` were verified to work with Argon. A 403/404 shows a clear no-access error.
+    Argon is paid-tier; pricing was $2/$10 per 1M tokens in/out through 2026-11-30, then $4/$20.
+
 The app is currently in a stable, extensible state aligned with these changes.

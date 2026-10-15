@@ -1,6 +1,12 @@
-export type ToolbarActionId = 'analyze' | 'generate' | 'print' | 'reset';
+export type ToolbarActionId =
+  | 'analyze'
+  | 'generate'
+  | 'argonMedium'
+  | 'argonHigh'
+  | 'print'
+  | 'reset';
 
-export type ToolbarActionVariant = 'default' | 'primary' | 'danger';
+export type ToolbarActionVariant = 'default' | 'primary' | 'danger' | 'argon';
 
 export type ToolbarActionTemplate = {
   id: ToolbarActionId;

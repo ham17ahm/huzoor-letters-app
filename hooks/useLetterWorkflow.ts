@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { analyzePdfRequest, clearPdfSessionRequest, generateRepliesRequest } from '@/lib/apiClient';
+import { ARGON_ENGINE_LABELS, type GenerateEngine } from '@/lib/argonEngine';
 import {
   applyAfterGenerateProcessors,
   applyBeforeGenerateProcessors,
@@ -29,7 +30,7 @@ type WorkflowApi = WorkflowState & {
   setSelectedIndex: (index: number) => void;
   handleFileSelected: (file: File) => void;
   analyzePdf: () => Promise<void>;
-  generateReplies: () => Promise<void>;
+  generateReplies: (engine?: GenerateEngine) => Promise<void>;
   resetAll: () => void;
 };
 
@@ -158,7 +159,7 @@ export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): Workf
     }
   }
 
-  async function generateReplies() {
+  async function generateReplies(engine?: GenerateEngine) {
     if (!state.pdfSessionId || !state.letters.length) {
       setState((current) => ({ ...current, error: 'Please analyze the PDF before generating replies.' }));
       return;
@@ -172,7 +173,8 @@ export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): Workf
       return;
     }
 
-    const signal = beginOperation('Generating replies with Gemini...');
+    const modelLabel = engine ? ARGON_ENGINE_LABELS[engine] : 'Gemini';
+    const signal = beginOperation(`Generating replies with ${modelLabel}...`);
     if (!signal) return;
 
     setState((current) => ({ ...current, error: null, success: null }));
@@ -188,7 +190,7 @@ export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): Workf
         return applyBeforeGenerateProcessors(letter, processors, context);
       });
 
-      const data = await generateRepliesRequest(pdfSessionId, requestLetters, signal);
+      const data = await generateRepliesRequest(pdfSessionId, requestLetters, signal, engine);
       const repliesById = new Map(data.replies.map((reply) => [reply.letter_id, reply]));
       const nextLetters = state.letters.map((letter, index) => {
         const reply = repliesById.get(letter.letter_id);
@@ -220,7 +222,9 @@ export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): Workf
 
       setState((current) => ({
         ...current,
-        success: 'Replies generated. Please review and edit all fields before printing.'
+        success: engine
+          ? `Replies generated with ${modelLabel}. Please review and edit all fields before printing.`
+          : 'Replies generated. Please review and edit all fields before printing.'
       }));
     } catch (error) {
       if (!isAbortError(error)) {

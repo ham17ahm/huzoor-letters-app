@@ -1,4 +1,5 @@
 import { clearPdfSessionRequest } from '@/lib/apiClient';
+import type { GenerateEngine } from '@/lib/argonEngine';
 import type {
   NoteFreeAnalyzePdfResponse,
   NoteFreeApiError,
@@ -11,7 +12,8 @@ export type NoteFreeApiClient = {
   generateRepliesRequest: (
     pdfSessionId: string,
     letters: NoteFreeLetterRecord[],
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    engine?: GenerateEngine
   ) => Promise<NoteFreeGenerateRepliesResponse>;
   clearPdfSessionRequest: typeof clearPdfSessionRequest;
 };
@@ -31,10 +33,11 @@ export function createNoteFreeApiClient(apiBasePath: string): NoteFreeApiClient 
       return parseApiResponse<NoteFreeAnalyzePdfResponse>(response, 'Failed to analyze PDF.');
     },
 
-    async generateRepliesRequest(pdfSessionId, letters, signal) {
+    async generateRepliesRequest(pdfSessionId, letters, signal, engine) {
       const formData = new FormData();
       formData.append('pdfSessionId', pdfSessionId);
       formData.append('letters', JSON.stringify(letters));
+      if (engine) formData.append('engine', engine);
 
       const response = await fetch(`${apiBasePath}/generate-replies`, {
         method: 'POST',

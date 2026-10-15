@@ -66,6 +66,17 @@ button:disabled {
   border-color: #f5b5ae;
 }
 
+.argonButton {
+  background: #0f766e;
+  color: white;
+  border-color: #0f766e;
+}
+
+.argonButton:hover:not(:disabled) {
+  background: #0b5d57;
+  border-color: #0b5d57;
+}
+
 input,
 textarea {
   width: 100%;

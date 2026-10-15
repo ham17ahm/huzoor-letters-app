@@ -3,6 +3,7 @@ import type {
   ApiError,
   GenerateRepliesResponse
 } from '@/types/api';
+import type { GenerateEngine } from '@/lib/argonEngine';
 import type { LetterRecord } from '@/types/letter';
 
 export async function analyzePdfRequest(file: File, signal?: AbortSignal): Promise<AnalyzePdfResponse> {
@@ -21,11 +22,13 @@ export async function analyzePdfRequest(file: File, signal?: AbortSignal): Promi
 export async function generateRepliesRequest(
   pdfSessionId: string,
   letters: LetterRecord[],
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  engine?: GenerateEngine
 ): Promise<GenerateRepliesResponse> {
   const formData = new FormData();
   formData.append('pdfSessionId', pdfSessionId);
   formData.append('letters', JSON.stringify(letters));
+  if (engine) formData.append('engine', engine);
 
   const response = await fetch('/api/generate-replies', {
     method: 'POST',

@@ -64,5 +64,6 @@ export function Toolbar({
 function buttonClassName(action: ToolbarAction): string | undefined {
   if (action.variant === 'primary') return 'primaryButton';
   if (action.variant === 'danger') return 'dangerButton';
+  if (action.variant === 'argon') return 'argonButton';
   return undefined;
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { ARGON_ENGINE_LABELS, type GenerateEngine } from '@/lib/argonEngine';
 import type { NoteFreeApiClient } from '@/lib/noteFree/apiClient';
 import type { NoteFreeLetterRecord } from '@/types/noteFree';
 
@@ -26,7 +27,7 @@ export type NoteFreeLetterWorkflow = WorkflowState & {
   setSelectedIndex: (index: number) => void;
   handleFileSelected: (file: File) => void;
   analyzePdf: () => Promise<void>;
-  generateReplies: () => Promise<void>;
+  generateReplies: (engine?: GenerateEngine) => Promise<void>;
   resetAll: () => void;
 };
 
@@ -150,7 +151,7 @@ export function useNoteFreeLetterWorkflow(
     }
   }
 
-  async function generateReplies() {
+  async function generateReplies(engine?: GenerateEngine) {
     if (!state.pdfSessionId || !state.letters.length) {
       setState((current) => ({
         ...current,
@@ -159,7 +160,8 @@ export function useNoteFreeLetterWorkflow(
       return;
     }
 
-    const signal = beginOperation('Generating replies with Gemini...');
+    const modelLabel = engine ? ARGON_ENGINE_LABELS[engine] : 'Gemini';
+    const signal = beginOperation(`Generating replies with ${modelLabel}...`);
     if (!signal) return;
 
     setState((current) => ({ ...current, error: null, success: null }));
@@ -168,7 +170,8 @@ export function useNoteFreeLetterWorkflow(
       const data = await apiClient.generateRepliesRequest(
         state.pdfSessionId,
         state.letters,
-        signal
+        signal,
+        engine
       );
       const repliesById = new Map(data.replies.map((reply) => [reply.letter_id, reply]));
       const nextLetters = state.letters.map((letter) => {
@@ -187,9 +190,10 @@ export function useNoteFreeLetterWorkflow(
       setState((current) => ({
         ...current,
         letters: nextLetters,
-        success:
-          config.generateSuccessMessage ??
-          'Replies generated. Please review and edit all fields before printing.'
+        success: engine
+          ? `Replies generated with ${modelLabel}. Please review and edit all fields before printing.`
+          : (config.generateSuccessMessage ??
+            'Replies generated. Please review and edit all fields before printing.')
       }));
     } catch (error) {
       if (!isAbortError(error)) {
