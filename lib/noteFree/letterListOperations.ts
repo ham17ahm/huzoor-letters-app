@@ -7,6 +7,21 @@ export type NoteFreeLetterListChange = {
   selectedIndex: number;
 };
 
+export function addLetterAfter(letters: NoteFreeLetterRecord[], index: number): NoteFreeLetterListChange {
+  const selectedIndex = letters.length ? resolveSelectedIndex(index, letters.length) + 1 : 0;
+  const blank: NoteFreeLetterRecord = {
+    letter_id: '',
+    source_pages: [],
+    full_name: '',
+    location: '',
+    inquiry: '',
+    prayer_sentence: ''
+  };
+  const next = [...letters];
+  next.splice(selectedIndex, 0, blank);
+  return { letters: resequenceLetters(next), selectedIndex };
+}
+
 export function setLetterAt(
   letters: NoteFreeLetterRecord[],
   index: number,

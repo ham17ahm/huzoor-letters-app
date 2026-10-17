@@ -66,10 +66,29 @@ in an in-memory `pdfSession`, 2h TTL) → [enter notes — `/` only] → **Gener
 - Config-driven extension points: `lib/toolbarConfig.ts`, `lib/inquiryPhraseButtons.ts`,
   `lib/aiModelConfig.ts`, `lib/printConfig.ts`.
 
+## Add new form (confirmed behavior)
+
+- All four routes provide **Add new** alongside Merge previous, Merge next, and Remove.
+- Insert and select a **blank form immediately after the current form**, never automatically
+  at the end. Preserve existing content and resequence positional letter IDs.
+- The added letter always exists in the uploaded PDF; standalone letters without a PDF are
+  outside this feature's scope. Leave source pages blank for the operator to enter explicitly.
+- Preserve each route's fields, phrase/name buttons, language/direction, generation, and print
+  behavior. Standard includes a blank required note; the three note-free routes omit notes.
+- `addLetterAfter` lives in `lib/letterListOperations.ts` and
+  `lib/noteFree/letterListOperations.ts`; `lib/ps/letterListOperations.ts` re-exports the latter.
+  The standard and shared note-free form cards/lists wire the button and selection update.
+- Disable Add new while busy. Both workflow hooks block all generation engines until every
+  form has source pages; Standard still requires notes. New forms join the existing bulk request.
+- Verification on 2026-10-17: 64 tests passed; production build, TypeScript, and lint passed.
+  Local production-browser checks passed for all four routes: insertion, blank fields,
+  validation, request payloads, busy state, reply mapping, printing, merge/remove, and reset.
+  AI responses were simulated; live Gemini was not exercised in this verification.
+
 ## Conventions / gotchas
 
 - `letter_id` is **positional** — `letterListOperations` auto-resequences to `L001…` after any
-  merge/remove/edit. Don't treat it as stable.
+  add/merge/remove/edit. Don't treat it as stable.
 - `/` requires a non-empty note before generation (guarded client- and server-side); `/ps` has
   no such gate.
 - Print differs by route. `/` uses a `/print` route + `localStorage` hand-off

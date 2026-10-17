@@ -14,6 +14,7 @@ type Props = {
   onChange: (updated: LetterRecord) => void;
   onMergePrevious: () => void;
   onMergeNext: () => void;
+  onAddNew: () => void;
   onRemove: () => void;
 };
 
@@ -25,6 +26,7 @@ export function LetterFormCard({
   onChange,
   onMergePrevious,
   onMergeNext,
+  onAddNew,
   onRemove
 }: Props) {
   const update = (patch: Partial<LetterRecord>) => onChange({ ...letter, ...patch });
@@ -72,7 +74,9 @@ export function LetterFormCard({
             onBlur={(event) => commitPages(event.target.value)}
             placeholder="1 or 1-3"
           />
-          {pagesError ? <div className="fieldError">{pagesError}</div> : null}
+          {pagesError || !letter.source_pages.length ? (
+            <div className="fieldError">{pagesError || 'Enter the PDF page number(s) for this letter.'}</div>
+          ) : null}
         </div>
         <div className="cardActions">
           <button
@@ -88,6 +92,9 @@ export function LetterFormCard({
             title="Merge this letter with the next one"
           >
             Merge next
+          </button>
+          <button type="button" onClick={onAddNew} disabled={disabled} title="Add a blank letter form immediately after this one">
+            Add new
           </button>
           <button className="dangerButton" onClick={onRemove} disabled={disabled || total <= 1}>
             Remove

@@ -5,6 +5,7 @@ import { NoteFreeLetterFormCard } from '@/components/noteFree/NoteFreeLetterForm
 import { NoteFreeLetterSidebar } from '@/components/noteFree/NoteFreeLetterSidebar';
 import { LetterPagination } from '@/components/LetterPagination';
 import {
+  addLetterAfter,
   mergeLetterAt,
   removeLetterAt,
   resolveSelectedIndex,
@@ -55,6 +56,11 @@ export function NoteFreeLetterFormList({
     onLettersChange(change.letters, { nextSelectedIndex: change.selectedIndex });
   }
 
+  function addAfter(index: number) {
+    const change = addLetterAfter(letters, index);
+    onLettersChange(change.letters, { nextSelectedIndex: change.selectedIndex });
+  }
+
   function removeAt(index: number) {
     const change = removeLetterAt(letters, index);
     onLettersChange(change.letters, { nextSelectedIndex: change.selectedIndex });
@@ -91,6 +97,7 @@ export function NoteFreeLetterFormList({
           onChange={(updated) => setLetter(activeIndex, updated)}
           onMergePrevious={() => mergeAt(activeIndex, 'previous')}
           onMergeNext={() => mergeAt(activeIndex, 'next')}
+          onAddNew={() => addAfter(activeIndex)}
           onRemove={() => removeAt(activeIndex)}
         />
       </div>

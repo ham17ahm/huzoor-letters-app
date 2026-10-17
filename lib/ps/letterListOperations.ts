@@ -1,4 +1,5 @@
 export {
+  addLetterAfter,
   mergeLetterAt,
   removeLetterAt,
   resequenceLetters,

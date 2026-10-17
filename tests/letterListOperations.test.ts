@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   combineText,
+  addLetterAfter,
   mergeLetterAt,
   removeLetterAt,
   resolveSelectedIndex,
@@ -92,4 +93,32 @@ function makeLetter(patch: Partial<LetterRecord>): LetterRecord {
     prayer_sentence: '',
     ...patch
   };
+}
+
+for (const index of [0, 1, 2]) {
+  test(`addLetterAfter inserts and selects a blank form after index ${index}`, () => {
+    const letters = [1, 2, 3].map((page) => makeLetter({
+      letter_id: `L00${page}`, source_pages: [page], full_name: `Name ${page}`,
+      location: 'London', inquiry: 'Existing inquiry', prayer_sentence: 'Existing prayer'
+    }));
+    const original = structuredClone(letters);
+    const change = addLetterAfter(letters, index);
+    assert.equal(change.selectedIndex, index + 1);
+    assert.equal(change.letters.length, 4);
+    assert.deepEqual(change.letters.map((letter) => letter.letter_id), ['L001', 'L002', 'L003', 'L004']);
+    const blank = change.letters[index + 1];
+    assert.deepEqual(blank.source_pages, []);
+    for (const [key, value] of Object.entries(blank)) {
+      if (key !== 'letter_id' && key !== 'source_pages') assert.equal(value, '');
+    }
+    const remaining = change.letters.filter((_, position) => position !== index + 1);
+    remaining.forEach((letter, position) => assert.deepEqual(
+      { ...letter, letter_id: original[position].letter_id }, original[position]
+    ));
+    assert.deepEqual(letters, original);
+    const edited = setLetterAt(change.letters, index + 1, { ...blank, source_pages: [4], full_name: 'Added' });
+    assert.equal(edited.letters[index + 1].full_name, 'Added');
+    assert.deepEqual(removeLetterAt(edited.letters, index + 1).letters, original);
+    assert.ok(mergeLetterAt(edited.letters, index + 1, 'previous'));
+  });
 }

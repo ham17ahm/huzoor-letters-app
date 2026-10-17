@@ -7,6 +7,22 @@ export type LetterListChange = {
   selectedIndex: number;
 };
 
+export function addLetterAfter(letters: LetterRecord[], index: number): LetterListChange {
+  const selectedIndex = letters.length ? resolveSelectedIndex(index, letters.length) + 1 : 0;
+  const blank: LetterRecord = {
+    letter_id: '',
+    source_pages: [],
+    full_name: '',
+    location: '',
+    note: '',
+    inquiry: '',
+    prayer_sentence: ''
+  };
+  const next = [...letters];
+  next.splice(selectedIndex, 0, blank);
+  return { letters: resequenceLetters(next), selectedIndex };
+}
+
 export function setLetterAt(
   letters: LetterRecord[],
   index: number,

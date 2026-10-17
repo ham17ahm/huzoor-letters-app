@@ -173,6 +173,15 @@ export function useLetterWorkflow(options: UseLetterWorkflowOptions = {}): Workf
       return;
     }
 
+    const missingPages = state.letters.filter((letter) => !letter.source_pages.length);
+    if (missingPages.length) {
+      setState((current) => ({
+        ...current,
+        error: `Please enter PDF page numbers for ${missingPages.map((letter) => letter.letter_id).join(', ')} before generating replies.`
+      }));
+      return;
+    }
+
     const modelLabel = engine ? ARGON_ENGINE_LABELS[engine] : 'Gemini';
     const signal = beginOperation(`Generating replies with ${modelLabel}...`);
     if (!signal) return;

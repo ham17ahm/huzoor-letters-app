@@ -12,6 +12,7 @@ type Props = {
   onChange: (updated: PsLetterRecord) => void;
   onMergePrevious: () => void;
   onMergeNext: () => void;
+  onAddNew: () => void;
   onRemove: () => void;
 };
 

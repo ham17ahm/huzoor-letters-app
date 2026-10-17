@@ -115,6 +115,33 @@ There are four parallel workflows:
 - Textarea default height is controlled globally in `app/globals.css` by the base `textarea` rule. It is currently `min-height: 120px`.
 - Inquiry phrase buttons are rendered from `lib/inquiryPhraseButtons.ts` and displayed in a 2-column grid so six buttons fit as three rows.
 
+### Adding a missed letter form
+
+All four routes expose **Add new** beside the merge/remove controls. It inserts and selects a
+blank form immediately after the current form (not automatically at the end), preserves all
+existing form content, and resequences IDs as `L001`, `L002`, etc. This supports additional
+letters already present in the uploaded PDF, including letters missed by detection; it does
+not introduce a standalone workflow without a PDF.
+
+The new form retains the route's normal fields, editor actions, localization, generation, and
+printing. Its text fields and `source_pages` start empty. Standard also has an empty required
+note; note-free routes do not gain a note field. The operator enters the correct PDF page range.
+Both workflow hooks block generation, including Argon engines, when any form lacks source
+pages, and the standard note requirement remains in force. Add new is disabled during processing.
+
+Implementation: `addLetterAfter` in `lib/letterListOperations.ts` and
+`lib/noteFree/letterListOperations.ts`, re-exported by `lib/ps/letterListOperations.ts`.
+`LetterFormCard` / `LetterFormList` implement Standard; the shared `NoteFreeLetterFormCard` /
+`NoteFreeLetterFormList` cover PS, Dua Urdu, and PS Urdu. Added forms use the existing PDF
+session, bulk reply mapping, sidebar/pagination, merge/remove actions, and print paths.
+
+Verification on 2026-10-17: all 64 automated tests passed, along with the production build,
+TypeScript, and lint checks. Browser checks against the local production build passed across
+all four routes for insertion, blank fields, page/note validation, generation payloads, disabled
+busy controls, reply mapping, printing, merging, removal, and reset, with no browser runtime
+errors. Browser checks used simulated AI responses; live Gemini was not exercised. The
+one-off browser script was kept in ignored `.test-dist`, not added as a test-suite dependency.
+
 ### Generation mode
 
 - `Generate Replies` runs for **all letters in one bulk Gemini request**.
@@ -368,5 +395,10 @@ Completed refactors in this phase:
     Detect PDF and the original Generate Replies button are unchanged. Streaming SSE and
     `mediaResolution` were verified to work with Argon. A 403/404 shows a clear no-access error.
     Argon is paid-tier; pricing was $2/$10 per 1M tokens in/out through 2026-11-30, then $4/$20.
+
+27. Added **Add new** to all four workflows, inserting and selecting a blank form immediately
+    after the current form for a letter already in the uploaded PDF. Added page requirements
+    before generation and insertion regression tests. See "Adding a missed letter form" for
+    the confirmed behavior, implementation seams, and verification limits.
 
 The app is currently in a stable, extensible state aligned with these changes.

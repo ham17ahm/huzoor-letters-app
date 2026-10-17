@@ -4,6 +4,7 @@ import { LetterFormCard } from '@/components/LetterFormCard';
 import { LetterPagination } from '@/components/LetterPagination';
 import { LetterSidebar } from '@/components/LetterSidebar';
 import {
+  addLetterAfter,
   mergeLetterAt,
   removeLetterAt,
   resolveSelectedIndex,
@@ -49,6 +50,11 @@ export function LetterFormList({
     onLettersChange(change.letters, { nextSelectedIndex: change.selectedIndex });
   }
 
+  function addAfter(index: number) {
+    const change = addLetterAfter(letters, index);
+    onLettersChange(change.letters, { nextSelectedIndex: change.selectedIndex });
+  }
+
   function removeAt(index: number) {
     const change = removeLetterAt(letters, index);
     onLettersChange(change.letters, { nextSelectedIndex: change.selectedIndex });
@@ -79,6 +85,7 @@ export function LetterFormList({
           onChange={(updated) => setLetter(activeIndex, updated)}
           onMergePrevious={() => mergeAt(activeIndex, 'previous')}
           onMergeNext={() => mergeAt(activeIndex, 'next')}
+          onAddNew={() => addAfter(activeIndex)}
           onRemove={() => removeAt(activeIndex)}
         />
       </div>
