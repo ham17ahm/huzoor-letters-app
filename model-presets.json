@@ -10,6 +10,15 @@
           "mediaResolution": "MEDIA_RESOLUTION_HIGH",
           "temperature": 0.1
         }
+      },
+      {
+        "id": "gemini-3.8-flash",
+        "label": "Gemini 3.8 Flash",
+        "model": "gemini-3.8-flash",
+        "generationConfig": {
+          "mediaResolution": "MEDIA_RESOLUTION_HIGH",
+          "thinkingConfig": { "thinkingLevel": "medium" }
+        }
       }
     ]
   },
@@ -50,6 +59,33 @@
         "generationConfig": {
           "mediaResolution": "MEDIA_RESOLUTION_HIGH",
           "temperature": 0.1
+        }
+      },
+      {
+        "id": "gemini-3.8-flash",
+        "label": "Gemini 3.8 Flash",
+        "model": "gemini-3.8-flash",
+        "generationConfig": {
+          "mediaResolution": "MEDIA_RESOLUTION_HIGH",
+          "thinkingConfig": { "thinkingLevel": "medium" }
+        }
+      },
+      {
+        "id": "neon-medium",
+        "label": "Neon 4 Medium",
+        "model": "gemini-4-neon",
+        "generationConfig": {
+          "mediaResolution": "MEDIA_RESOLUTION_HIGH",
+          "thinkingConfig": { "thinkingLevel": "medium" }
+        }
+      },
+      {
+        "id": "neon-high",
+        "label": "Neon 4 High",
+        "model": "gemini-4-neon",
+        "generationConfig": {
+          "mediaResolution": "MEDIA_RESOLUTION_HIGH",
+          "thinkingConfig": { "thinkingLevel": "high" }
         }
       }
     ]
