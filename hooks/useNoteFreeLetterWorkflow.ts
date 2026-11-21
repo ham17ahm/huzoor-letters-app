@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ARGON_ENGINE_LABELS, type GenerateEngine } from '@/lib/argonEngine';
+import type { ModelOption } from '@/types/modelPresets';
 import type { NoteFreeApiClient } from '@/lib/noteFree/apiClient';
 import type { NoteFreeLetterRecord } from '@/types/noteFree';
 
@@ -26,15 +26,14 @@ export type NoteFreeLetterWorkflow = WorkflowState & {
   ) => void;
   setSelectedIndex: (index: number) => void;
   handleFileSelected: (file: File) => void;
-  analyzePdf: () => Promise<void>;
-  generateReplies: (engine?: GenerateEngine) => Promise<void>;
+  analyzePdf: (model: ModelOption) => Promise<void>;
+  generateReplies: (model: ModelOption) => Promise<void>;
   resetAll: () => void;
 };
 
 export type NoteFreeWorkflowConfig = {
   apiClient: NoteFreeApiClient;
   analyzeSuccessMessage: (letterCount: number) => string;
-  generateSuccessMessage?: string;
 };
 
 const initialState: WorkflowState = {
@@ -116,22 +115,19 @@ export function useNoteFreeLetterWorkflow(
     resetUiState();
   }
 
-  async function analyzePdf() {
+  async function analyzePdf(model: ModelOption) {
     if (!state.pdfFile) return;
 
-    const signal = beginOperation('Analyzing PDF with Gemini...');
+    const signal = beginOperation(`Analyzing PDF with ${model.label}...`);
     if (!signal) return;
 
-    setState((current) => ({
-      ...current,
-      error: null,
-      success: null,
-      pdfSessionId: null
-    }));
-    await apiClient.clearPdfSessionRequest(pdfSessionIdRef.current);
+    // Keep the current session and letters until detection succeeds, so a failed
+    // re-detection never blocks generation for letters the operator already edited.
+    const previousSessionId = pdfSessionIdRef.current;
+    setState((current) => ({ ...current, error: null, success: null }));
 
     try {
-      const data = await apiClient.analyzePdfRequest(state.pdfFile, signal);
+      const data = await apiClient.analyzePdfRequest(state.pdfFile, signal, model.id);
       setState((current) => ({
         ...current,
         pdfSessionId: data.pdfSessionId,
@@ -139,6 +135,9 @@ export function useNoteFreeLetterWorkflow(
         selectedIndex: 0,
         success: config.analyzeSuccessMessage(data.letters.length)
       }));
+      if (previousSessionId && previousSessionId !== data.pdfSessionId) {
+        void apiClient.clearPdfSessionRequest(previousSessionId);
+      }
     } catch (error) {
       if (!isAbortError(error)) {
         setState((current) => ({
@@ -151,7 +150,7 @@ export function useNoteFreeLetterWorkflow(
     }
   }
 
-  async function generateReplies(engine?: GenerateEngine) {
+  async function generateReplies(model: ModelOption) {
     if (!state.pdfSessionId || !state.letters.length) {
       setState((current) => ({
         ...current,
@@ -169,8 +168,7 @@ export function useNoteFreeLetterWorkflow(
       return;
     }
 
-    const modelLabel = engine ? ARGON_ENGINE_LABELS[engine] : 'Gemini';
-    const signal = beginOperation(`Generating replies with ${modelLabel}...`);
+    const signal = beginOperation(`Generating replies with ${model.label}...`);
     if (!signal) return;
 
     setState((current) => ({ ...current, error: null, success: null }));
@@ -180,7 +178,7 @@ export function useNoteFreeLetterWorkflow(
         state.pdfSessionId,
         state.letters,
         signal,
-        engine
+        model.id
       );
       const repliesById = new Map(data.replies.map((reply) => [reply.letter_id, reply]));
       const nextLetters = state.letters.map((letter) => {
@@ -199,10 +197,7 @@ export function useNoteFreeLetterWorkflow(
       setState((current) => ({
         ...current,
         letters: nextLetters,
-        success: engine
-          ? `Replies generated with ${modelLabel}. Please review and edit all fields before printing.`
-          : (config.generateSuccessMessage ??
-            'Replies generated. Please review and edit all fields before printing.')
+        success: `Replies generated with ${model.label}. Please review and edit all fields before printing.`
       }));
     } catch (error) {
       if (!isAbortError(error)) {

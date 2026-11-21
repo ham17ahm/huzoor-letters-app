@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getDetectPdfModel } from '@/lib/aiModelConfig';
+import { getRequestedModelPreset, InvalidModelPresetError } from '@/lib/modelPresets';
 import { generateWithGeminiPdf } from '@/lib/gemini';
 import { parseJsonFromText } from '@/lib/json';
 import { buildAnalyzePdfPrompt } from '@/lib/prompts';
@@ -21,12 +21,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Uploaded file must be a PDF.' }, { status: 400 });
     }
 
+    const preset = await getRequestedModelPreset('detectPdf', formData);
     const buffer = Buffer.from(await pdf.arrayBuffer());
     const pdfBase64 = buffer.toString('base64');
     const rawText = await generateWithGeminiPdf({
       pdfBase64,
       prompt: buildAnalyzePdfPrompt(),
-      model: getDetectPdfModel(),
+      preset,
       signal: request.signal
     });
 
@@ -44,6 +45,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ letters, pdfSessionId, rawText });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error.';
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: message }, { status: error instanceof InvalidModelPresetError ? 400 : 500 });
   }
 }

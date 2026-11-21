@@ -3,6 +3,7 @@ import { PHASE_DEVELOPMENT_SERVER } from 'next/constants';
 
 export default function nextConfig(phase: string): NextConfig {
   return {
+    outputFileTracingIncludes: { '/api/**/*': ['./model-presets.json'] },
     // Keep dev artifacts in a SIBLING directory of the production build dir.
     // `next build` wipes its whole distDir (`.next`), so nesting dev output at
     // `.next/dev` meant a build would delete a running dev server's artifacts.

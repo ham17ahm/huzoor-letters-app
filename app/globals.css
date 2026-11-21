@@ -30,6 +30,7 @@ body {
 
 button,
 input,
+select,
 textarea {
   font: inherit;
 }
@@ -64,17 +65,6 @@ button:disabled {
 .dangerButton {
   color: var(--danger);
   border-color: #f5b5ae;
-}
-
-.argonButton {
-  background: #0f766e;
-  color: white;
-  border-color: #0f766e;
-}
-
-.argonButton:hover:not(:disabled) {
-  background: #0b5d57;
-  border-color: #0b5d57;
 }
 
 input,
@@ -123,6 +113,7 @@ label {
   top: 0;
   z-index: 10;
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   align-items: center;
   justify-content: space-between;
@@ -177,6 +168,37 @@ label {
   align-items: center;
   flex-wrap: wrap;
   justify-content: flex-end;
+}
+
+.modelTask {
+  display: flex;
+  align-items: stretch;
+  max-width: 100%;
+}
+
+.modelTask select {
+  min-width: 0;
+  max-width: 13rem;
+  border: 1px solid var(--line);
+  border-right: 0;
+  border-radius: 8px 0 0 8px;
+  padding: 7px 8px;
+  background: white;
+  color: var(--ink);
+}
+
+.modelTask button {
+  border-radius: 0 8px 8px 0;
+  white-space: nowrap;
+}
+
+.modelConfigError {
+  flex-basis: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--danger);
+  font-size: 13px;
 }
 
 .mainGrid {

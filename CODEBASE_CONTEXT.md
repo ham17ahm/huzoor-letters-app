@@ -15,8 +15,8 @@ There are four parallel workflows:
 - `/ps` — a note-free clone (no note field; replies are generated purely from letter content).
   See "PS Route" below.
 - `/dua-urdu` — a note-free Urdu workflow sharing the PS-style workflow core while keeping its
-  prompt, validation, model configuration, RTL field presentation, and print view isolated.
-- `/ps-urdu` — a duplicate of Dua Urdu with independent route/API paths, model selectors, prompt
+  prompt, validation, RTL field presentation, and print view isolated.
+- `/ps-urdu` — a duplicate of Dua Urdu with independent route/API paths, prompt
   seam, print session, and print component/styles. Its supplied Private Secretary Urdu print
   design and dedicated PS Urdu generation prompt are implemented.
 
@@ -82,7 +82,7 @@ There are four parallel workflows:
 
 ### Domain/Utility Layer
 
-- `lib/aiModelConfig.ts` — master AI model config and workflow-specific model selectors.
+- `model-presets.json` — shared model presets and defaults for both tasks.
 - `lib/gemini.ts` — Gemini call implementation. Uses `streamGenerateContent` over SSE with a
   route-scoped Undici dispatcher so long-running Gemini Pro PDF requests are not cut off by
   Node's default five-minute header/body inactivity timeout.
@@ -178,18 +178,14 @@ Generate Replies → review → print), with two amendments:
 
 - **Reused untouched (shared, safe):** `lib/gemini.ts`, `lib/json.ts`, `lib/pageRanges.ts`,
   `lib/pdfSession.ts`, `lib/date.ts`, `lib/textInsertion.ts`,
-  `lib/inquiryPhraseButtons.ts`, `lib/toolbarConfig.ts`, `lib/printConfig.ts`,
+  `lib/inquiryPhraseButtons.ts`, `lib/printConfig.ts`,
   `components/PdfViewer.tsx`, `components/PdfUploader.tsx`, `components/LetterPagination.tsx`,
   `components/PrintPreview.module.css`, and `app/api/clear-pdf/route.ts`.
 - **Partially reused:** `lib/validators.ts` — PS reuses `normalizeBoundaries` (analyze route,
   prompt-agnostic), but reply normalization is forked (see `lib/ps/validators.ts` below)
   because the shared `normalizeReply` hardcodes the standard "I have received your letter"
   inquiry prefix, which would corrupt the PS inquiry.
-- **Shared files modified (additive only — `/` unaffected):**
-  - `lib/aiModelConfig.ts` — added `getPsDetectPdfModel()` / `getPsGenerateRepliesModel()`
-    (`GEMINI_PS_DETECT_PDF_MODEL`, `GEMINI_PS_GENERATE_REPLIES_MODEL`).
-  - `components/Toolbar.tsx` (+ `.routeNav` styles in `globals.css`) — the `[Standard] [PS]`
-    cross-link nav, active route highlighted via `usePathname`.
+- **Shared toolbar:** `components/Toolbar.tsx` includes the route navigation and model selectors.
 - **PS-specific files (the fork):**
   - `app/ps/page.tsx`
   - `app/api/ps/analyze-pdf/route.ts`, `app/api/ps/generate-replies/route.ts`
@@ -227,7 +223,6 @@ Generate Replies → review → print), with two amendments:
   controls remain English and LTR.
 - `lib/duaUrdu/prompts.ts` contains the route-specific Urdu generation rules and examples.
 - `/dua-urdu/print` uses the dedicated Urdu A4 correspondence template and route-specific CSS.
-- Dua Urdu has independent `GEMINI_DUA_URDU_*` model environment variables.
 
 ### PS Urdu route
 
@@ -245,13 +240,10 @@ Generate Replies → review → print), with two amendments:
   `/fonts/UTHMANTN1B VER09.OTF`.
 - `lib/psUrdu/printPreviewSession.ts` uses the isolated
   `huzoor-ps-urdu-print-preview:` local-storage namespace.
-- `GEMINI_PS_URDU_*` overrides are independent; when absent, selectors inherit the matching
-  `GEMINI_DUA_URDU_*` setting before using the global/default fallback.
 
-### 1) Toolbar config
+### 1) Toolbar
 
-- `lib/toolbarConfig.ts` + `types/toolbar.ts`
-- Add/reorder actions declaratively, then wire handler in `app/page.tsx`.
+- `components/Toolbar.tsx` defines the shared task controls and fetches model options.
 
 ### 2) Per-letter processor pipeline
 
@@ -272,11 +264,10 @@ Generate Replies → review → print), with two amendments:
 
 ### 4) AI model config
 
-- `lib/aiModelConfig.ts`
-- Master file for default Gemini models used by:
-  - Detect PDF
-  - Generate Replies
-- Environment variables still override the defaults.
+- `model-presets.json` defines task-specific presets and defaults shared by all four routes.
+- `lib/modelPresets.ts` loads and validates the file for the catalog and the task APIs.
+- The browser sends a preset ID. The server reads the Gemini model ID and generation settings
+  from the file and passes them to the shared Gemini transport.
 
 ---
 
@@ -284,21 +275,7 @@ Generate Replies → review → print), with two amendments:
 
 ### Gemini model configuration
 
-Gemini models are configured separately by workflow:
-
-```text
-GEMINI_DETECT_PDF_MODEL=gemini-2.5-flash
-GEMINI_GENERATE_REPLIES_MODEL=gemini-2.5-flash
-GEMINI_PS_DETECT_PDF_MODEL=gemini-2.5-flash
-GEMINI_PS_GENERATE_REPLIES_MODEL=gemini-2.5-flash
-GEMINI_DUA_URDU_DETECT_PDF_MODEL=gemini-2.5-flash
-GEMINI_DUA_URDU_GENERATE_REPLIES_MODEL=gemini-2.5-flash
-GEMINI_PS_URDU_DETECT_PDF_MODEL=gemini-2.5-flash
-GEMINI_PS_URDU_GENERATE_REPLIES_MODEL=gemini-2.5-flash
-GEMINI_REQUEST_TIMEOUT_MS=1200000
-```
-
-`GEMINI_MODEL` remains supported as a fallback if a workflow-specific variable is missing. If neither is set, `lib/aiModelConfig.ts` falls back to the built-in default model. The `GEMINI_PS_*` variables configure the `/ps` route independently and use the same fallback chain.
+See [Choose and configure models](README.md#choose-and-configure-models) for editing presets. Refresh the workflow page after saving.
 
 `GEMINI_REQUEST_TIMEOUT_MS` is optional and defaults to 20 minutes. It controls inactivity
 while waiting for Gemini response headers or the next streamed response chunk; request aborts

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { parseEngine, resolveArgonEngine } from '@/lib/argonEngine';
+import { getRequestedModelPreset, InvalidModelPresetError } from '@/lib/modelPresets';
 import { generateWithGeminiPdf, shouldLogGeminiRequests } from '@/lib/gemini';
 import { parseJsonFromText } from '@/lib/json';
 import { createPdfSession, getPdfSession } from '@/lib/pdfSession';
@@ -10,12 +10,10 @@ import type {
 } from '@/types/noteFree';
 
 type AnalyzeConfig = {
-  model: string;
   prompt: string;
 };
 
 type GenerateConfig = {
-  model: string;
   debugLabel: string;
   buildPrompt: (letters: NoteFreeLetterRecord[]) => string;
   normalizeReplies: (
@@ -37,12 +35,13 @@ export async function handleNoteFreeAnalyzePdf(request: Request, config: Analyze
       return NextResponse.json({ error: 'Uploaded file must be a PDF.' }, { status: 400 });
     }
 
+    const preset = await getRequestedModelPreset('detectPdf', formData);
     const buffer = Buffer.from(await pdf.arrayBuffer());
     const pdfBase64 = buffer.toString('base64');
     const rawText = await generateWithGeminiPdf({
       pdfBase64,
       prompt: config.prompt,
-      model: config.model,
+      preset,
       signal: request.signal
     });
 
@@ -90,12 +89,7 @@ export async function handleNoteFreeGenerateReplies(request: Request, config: Ge
       return NextResponse.json({ error: 'Missing letters to process.' }, { status: 400 });
     }
 
-    const engine = parseEngine(formData.get('engine'));
-    if (engine === null) {
-      return NextResponse.json({ error: 'Unknown generation engine.' }, { status: 400 });
-    }
-    const argon = engine ? resolveArgonEngine(engine) : null;
-
+    const preset = await getRequestedModelPreset('generateReplies', formData);
     const prompt = config.buildPrompt(letters);
     if (shouldLogGeminiRequests()) {
       console.log(`[Gemini][${config.debugLabel}] Final constructed prompt:\n`, prompt);
@@ -105,8 +99,7 @@ export async function handleNoteFreeGenerateReplies(request: Request, config: Ge
     const rawText = await generateWithGeminiPdf({
       pdfBase64,
       prompt,
-      model: argon?.model ?? config.model,
-      thinkingLevel: argon?.thinkingLevel,
+      preset,
       signal: request.signal
     });
 
@@ -124,5 +117,5 @@ export async function handleNoteFreeGenerateReplies(request: Request, config: Ge
 
 function errorResponse(error: unknown) {
   const message = error instanceof Error ? error.message : 'Unknown error.';
-  return NextResponse.json({ error: message }, { status: 500 });
+  return NextResponse.json({ error: message }, { status: error instanceof InvalidModelPresetError ? 400 : 500 });
 }

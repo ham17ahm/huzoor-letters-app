@@ -5,41 +5,21 @@ import { PdfViewer } from '@/components/PdfViewer';
 import { Toolbar } from '@/components/Toolbar';
 import { usePsUrduLetterWorkflow } from '@/hooks/usePsUrduLetterWorkflow';
 import { openPsUrduPrintPreviewTab } from '@/lib/psUrdu/printPreviewSession';
-import { TOOLBAR_ACTIONS } from '@/lib/toolbarConfig';
-import type { ToolbarAction, ToolbarActionId } from '@/types/toolbar';
 
 export default function PsUrduHome() {
   const workflow = usePsUrduLetterWorkflow();
 
-  const disabledById: Record<ToolbarActionId, boolean> = {
-    analyze: !workflow.hasPdf || workflow.isBusy,
-    generate: !workflow.hasPdf || !workflow.hasLetters || workflow.isBusy,
-    argonMedium: !workflow.hasPdf || !workflow.hasLetters || workflow.isBusy,
-    argonHigh: !workflow.hasPdf || !workflow.hasLetters || workflow.isBusy,
-    print: !workflow.hasLetters || workflow.isBusy,
-    reset: workflow.isBusy
-  };
-
-  const handlerById: Record<ToolbarActionId, () => void> = {
-    analyze: () => void workflow.analyzePdf(),
-    generate: () => void workflow.generateReplies(),
-    argonMedium: () => void workflow.generateReplies('argon-medium'),
-    argonHigh: () => void workflow.generateReplies('argon-high'),
-    print: () => openPsUrduPrintPreviewTab(workflow.letters),
-    reset: workflow.resetAll
-  };
-
-  const toolbarActions: ToolbarAction[] = TOOLBAR_ACTIONS.map((action) => ({
-    ...action,
-    disabled: disabledById[action.id],
-    onClick: handlerById[action.id]
-  }));
-
   return (
     <div className="appShell duaUrduRoute psUrduRoute">
       <Toolbar
-        actions={toolbarActions}
         subtitle="Upload → Detect PDF → Generate PS Urdu Replies → Review → Print"
+        isBusy={workflow.isBusy}
+        hasPdf={workflow.hasPdf}
+        hasLetters={workflow.hasLetters}
+        onAnalyze={workflow.analyzePdf}
+        onGenerate={workflow.generateReplies}
+        onPrint={() => openPsUrduPrintPreviewTab(workflow.letters)}
+        onReset={workflow.resetAll}
       />
 
       <main className="mainGrid">

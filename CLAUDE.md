@@ -19,10 +19,8 @@ No database, no auth, no persistence — all state is session-local. Runtime dep
 | `/dua-urdu` | Urdu reply workflow | Note-free Urdu generation and dedicated Urdu print view. |
 | `/ps-urdu` | PS Urdu workflow | Dua Urdu duplicate with isolated prompt and print replacement seams. |
 
-`/ps` is an isolated fork. It **reuses** stable, side-effect-free libs and only forks what
-embeds note logic or differs. The two shared files it touches are additive only:
-`lib/aiModelConfig.ts` (PS model selectors) and `components/Toolbar.tsx` (the `[Standard] [PS]`
-cross-link nav). Keep `/` behavior unchanged when editing PS.
+The three note-free workflows share the editor, workflow hook, and server handlers.
+Each route keeps its own generation prompt, reply validator, and print view.
 
 ## The pipeline
 
@@ -54,17 +52,17 @@ in an in-memory `pdfSession`, 2h TTL) → [enter notes — `/` only] → **Gener
   `lib/gemini.ts` — shared Gemini transport using `streamGenerateContent` SSE and a configurable
   long-running Undici dispatcher. `lib/geminiSse.ts` assembles streamed UTF-8 text for the
   existing JSON parsers and validators.
-- **Argon 4 buttons** (`Argon 4 Medium` / `Argon 4 High`, teal `.argonButton`, all four routes) run
-  the *same* bulk generate flow on `gemini-4-argon` with `thinkingLevel` medium/high. The client
-  sends an optional `engine` form field (`'argon-medium' | 'argon-high'`); the generate handlers
-  (`lib/noteFree/serverHandlers.ts`, `app/api/generate-replies/route.ts`) resolve it through
-  `lib/argonEngine.ts`. No `engine` = unchanged behavior. Detect PDF never uses Argon. Model comes
-  from `GEMINI_ARGON_MODEL` (default `gemini-4-argon`) and deliberately ignores `GEMINI_MODEL`.
-  `lib/geminiGenerationConfig.ts` omits `temperature` for Argon (it ignores sampling params).
-  A 403/404 on an Argon call surfaces a clear "isn't available for this API key" error — no
-  silent fallback to Flash.
-- Config-driven extension points: `lib/toolbarConfig.ts`, `lib/inquiryPhraseButtons.ts`,
-  `lib/aiModelConfig.ts`, `lib/printConfig.ts`.
+- `model-presets.json` defines the model dropdowns and defaults for both tasks on all routes.
+  `lib/modelPresets.ts` validates the file at request time and resolves the submitted
+  `modelPreset` ID. The toolbar gets IDs and labels from `/api/model-presets`. The server
+  passes the selected preset's optional `generationConfig` through to Gemini.
+  The toolbar re-reads `/api/model-presets` on each task-button press and stops before any
+  task request if the shown preset was removed. Detect PDF keeps the existing PDF session and
+  letters until a new detection succeeds, then clears the old session; never clear it first.
+  `/api/model-presets` also returns `legacyEnvVars` (names only) for ignored `GEMINI_*MODEL`
+  variables, shown as a toolbar migration notice and logged once on the server.
+- Config-driven extension points: `model-presets.json`, `lib/inquiryPhraseButtons.ts`, and
+  `lib/printConfig.ts`.
 
 ## Add new form (confirmed behavior)
 
@@ -121,20 +119,11 @@ harness.
 
 ```text
 GEMINI_API_KEY=...
-GEMINI_DETECT_PDF_MODEL=gemini-2.5-flash
-GEMINI_GENERATE_REPLIES_MODEL=gemini-2.5-flash
-GEMINI_PS_DETECT_PDF_MODEL=gemini-2.5-flash
-GEMINI_PS_GENERATE_REPLIES_MODEL=gemini-2.5-flash
-GEMINI_DUA_URDU_DETECT_PDF_MODEL=gemini-2.5-flash
-GEMINI_DUA_URDU_GENERATE_REPLIES_MODEL=gemini-2.5-flash
-GEMINI_PS_URDU_DETECT_PDF_MODEL=gemini-2.5-flash
-GEMINI_PS_URDU_GENERATE_REPLIES_MODEL=gemini-2.5-flash
-GEMINI_ARGON_MODEL=gemini-4-argon
 GEMINI_REQUEST_TIMEOUT_MS=1200000
 DEBUG_GEMINI_REQUESTS=false
 ```
 
-`GEMINI_MODEL` is a fallback for any unset workflow-specific model, then the built-in default.
+Both task defaults and all selectable Gemini models are configured in `model-presets.json`.
 `GEMINI_REQUEST_TIMEOUT_MS` is optional and defaults to a 20-minute response-header/chunk
 inactivity timeout. Browser aborts still cancel the upstream Gemini request immediately.
 `DEBUG_GEMINI_REQUESTS=true` logs full request bodies (incl. base64 PDF) and the constructed

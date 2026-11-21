@@ -1,5 +1,4 @@
 import { clearPdfSessionRequest } from '@/lib/apiClient';
-import type { GenerateEngine } from '@/lib/argonEngine';
 import type {
   NoteFreeAnalyzePdfResponse,
   NoteFreeApiError,
@@ -8,21 +7,22 @@ import type {
 } from '@/types/noteFree';
 
 export type NoteFreeApiClient = {
-  analyzePdfRequest: (file: File, signal?: AbortSignal) => Promise<NoteFreeAnalyzePdfResponse>;
+  analyzePdfRequest: (file: File, signal?: AbortSignal, modelPreset?: string) => Promise<NoteFreeAnalyzePdfResponse>;
   generateRepliesRequest: (
     pdfSessionId: string,
     letters: NoteFreeLetterRecord[],
     signal?: AbortSignal,
-    engine?: GenerateEngine
+    modelPreset?: string
   ) => Promise<NoteFreeGenerateRepliesResponse>;
   clearPdfSessionRequest: typeof clearPdfSessionRequest;
 };
 
 export function createNoteFreeApiClient(apiBasePath: string): NoteFreeApiClient {
   return {
-    async analyzePdfRequest(file, signal) {
+    async analyzePdfRequest(file, signal, modelPreset) {
       const formData = new FormData();
       formData.append('pdf', file);
+      if (modelPreset) formData.append('modelPreset', modelPreset);
 
       const response = await fetch(`${apiBasePath}/analyze-pdf`, {
         method: 'POST',
@@ -33,11 +33,11 @@ export function createNoteFreeApiClient(apiBasePath: string): NoteFreeApiClient 
       return parseApiResponse<NoteFreeAnalyzePdfResponse>(response, 'Failed to analyze PDF.');
     },
 
-    async generateRepliesRequest(pdfSessionId, letters, signal, engine) {
+    async generateRepliesRequest(pdfSessionId, letters, signal, modelPreset) {
       const formData = new FormData();
       formData.append('pdfSessionId', pdfSessionId);
       formData.append('letters', JSON.stringify(letters));
-      if (engine) formData.append('engine', engine);
+      if (modelPreset) formData.append('modelPreset', modelPreset);
 
       const response = await fetch(`${apiBasePath}/generate-replies`, {
         method: 'POST',

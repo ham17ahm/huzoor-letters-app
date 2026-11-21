@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getGenerateRepliesModel } from '@/lib/aiModelConfig';
-import { parseEngine, resolveArgonEngine } from '@/lib/argonEngine';
+import { getRequestedModelPreset, InvalidModelPresetError } from '@/lib/modelPresets';
 import { generateWithGeminiPdf, shouldLogGeminiRequests } from '@/lib/gemini';
 import { parseJsonFromText } from '@/lib/json';
 import { buildGenerateRepliesPrompt } from '@/lib/prompts';
@@ -40,12 +39,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: `Missing note for ${missingNote.letter_id}.` }, { status: 400 });
     }
 
-    const engine = parseEngine(formData.get('engine'));
-    if (engine === null) {
-      return NextResponse.json({ error: 'Unknown generation engine.' }, { status: 400 });
-    }
-    const argon = engine ? resolveArgonEngine(engine) : null;
-
+    const preset = await getRequestedModelPreset('generateReplies', formData);
     const prompt = buildGenerateRepliesPrompt(letters);
     if (shouldLogGeminiRequests()) {
       console.log('[Gemini][generate-replies] Final constructed prompt:\n', prompt);
@@ -55,8 +49,7 @@ export async function POST(request: Request) {
     const rawText = await generateWithGeminiPdf({
       pdfBase64,
       prompt,
-      model: argon?.model ?? getGenerateRepliesModel(),
-      thinkingLevel: argon?.thinkingLevel,
+      preset,
       signal: request.signal
     });
 
@@ -69,6 +62,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ replies, rawText });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error.';
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: message }, { status: error instanceof InvalidModelPresetError ? 400 : 500 });
   }
 }

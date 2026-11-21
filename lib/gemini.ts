@@ -1,6 +1,6 @@
 import { Agent, fetch as undiciFetch } from 'undici';
 import { collectGeminiSseText } from '@/lib/geminiSse';
-import { buildGenerationConfig, type GeminiThinkingLevel } from '@/lib/geminiGenerationConfig';
+import type { ModelPreset } from '@/lib/modelPresets';
 
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 const DEFAULT_GEMINI_REQUEST_TIMEOUT_MS = 20 * 60 * 1000;
@@ -17,12 +17,11 @@ export function shouldLogGeminiRequests(): boolean {
 export async function generateWithGeminiPdf(params: {
   pdfBase64: string;
   prompt: string;
-  model: string;
-  thinkingLevel?: GeminiThinkingLevel;
+  preset: ModelPreset;
   signal?: AbortSignal;
 }): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
-  const model = params.model;
+  const { model, label, generationConfig } = params.preset;
 
   if (!apiKey) {
     throw new Error('Missing GEMINI_API_KEY in .env.local');
@@ -43,7 +42,7 @@ export async function generateWithGeminiPdf(params: {
         ]
       }
     ],
-    generationConfig: buildGenerationConfig(params.thinkingLevel)
+    generationConfig
   };
 
   if (shouldLogGeminiRequests()) {
@@ -71,10 +70,9 @@ export async function generateWithGeminiPdf(params: {
 
   if (!response.ok) {
     const bodyText = await response.text();
-    // A thinking level is only sent for Argon requests; give a clear message when the key lacks access.
-    if (params.thinkingLevel && (response.status === 403 || response.status === 404)) {
+    if (response.status === 403 || response.status === 404) {
       throw new Error(
-        `Argon 4 (${model}) isn't available for this API key (${response.status}). It may require paid-tier or partner access. Details: ${bodyText}`
+        `Gemini rejected ${label} (${model}) with status ${response.status}. Check the model ID and API key access. Details: ${bodyText}`
       );
     }
     throw new Error(`Gemini request failed (${response.status}): ${bodyText}`);

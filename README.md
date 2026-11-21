@@ -9,9 +9,9 @@ The app provides four workflows: Standard (`/`), Private Secretary (`/ps`), Dua 
 
 1. Upload one PDF packet.
 2. Preview the PDF on the left.
-3. Click **Detect PDF** to detect individual letters and source pages.
-4. Enter one note per letter.
-5. Click **Generate Replies** to process all letters in one Gemini request, using the already-uploaded temporary PDF session.
+3. Choose a detection model, then click **Detect PDF** to detect individual letters and source pages.
+4. In Standard, enter one note per letter.
+5. Choose a reply model, then click **Generate Replies** to process all letters in one Gemini request, using the already-uploaded temporary PDF session.
 6. Review and edit every field. In the letter form, generated/editable text is ordered as Inquiry, Note, then Prayer sentence.
 7. Click **Print / PDF** to create one A4 reply page per letter and save through Chrome's print dialog.
 
@@ -54,19 +54,10 @@ The font file is not included. If you have the font, place it at that path. The 
 
 ```text
 GEMINI_API_KEY=...
-GEMINI_DETECT_PDF_MODEL=gemini-2.5-flash
-GEMINI_GENERATE_REPLIES_MODEL=gemini-2.5-flash
-GEMINI_PS_DETECT_PDF_MODEL=gemini-2.5-flash
-GEMINI_PS_GENERATE_REPLIES_MODEL=gemini-2.5-flash
-GEMINI_DUA_URDU_DETECT_PDF_MODEL=gemini-2.5-flash
-GEMINI_DUA_URDU_GENERATE_REPLIES_MODEL=gemini-2.5-flash
-GEMINI_PS_URDU_DETECT_PDF_MODEL=gemini-2.5-flash
-GEMINI_PS_URDU_GENERATE_REPLIES_MODEL=gemini-2.5-flash
 GEMINI_REQUEST_TIMEOUT_MS=1200000
 DEBUG_GEMINI_REQUESTS=false
 ```
 
-`GEMINI_MODEL` is still supported as a fallback if any workflow-specific model is not set.
 `GEMINI_REQUEST_TIMEOUT_MS` is optional and defaults to 20 minutes of inactivity while waiting
 for Gemini response headers or streamed output.
 
@@ -82,20 +73,66 @@ for Gemini response headers or streamed output.
 
 ## PS Urdu workflow
 
-- `/ps-urdu` is a functional duplicate of Dua Urdu with independent API routes, model selectors,
+- `/ps-urdu` is a functional duplicate of Dua Urdu with independent API routes,
   prompt seam, print-preview session, and print component/styles.
 - Its dedicated `lib/psUrdu/prompts.ts` implements the PS Urdu two-sentence inquiry style:
   acknowledgment to Huzoor Anwar followed by the fixed post-perusal prayer sentence.
 - Its `/ps-urdu/print` view uses the supplied Private Secretary Urdu letterhead, isolated under
   `components/ps-urdu/`. It uses the Jameel, Hasan Hiba (Kufi), and Usman font files in
   `public/fonts/`.
-- If `GEMINI_PS_URDU_*` variables are unset, PS Urdu inherits the corresponding Dua Urdu model.
+## Choose and configure models
 
-Model selection is intentionally route-specific:
+Each workflow has a model dropdown next to **Detect PDF** and **Generate Replies**. Choose a
+preset, then press the task button to run it. The defaults are **Gemini 2.5 Flash** for detection
+and **Argon 4 Medium** for replies.
 
-- Detect PDF uses `GEMINI_DETECT_PDF_MODEL`.
-- Generate Replies uses `GEMINI_GENERATE_REPLIES_MODEL`.
-- If one of those is missing, the code falls back to `GEMINI_MODEL`, then to the built-in default.
+Edit [model-presets.json](model-presets.json) in the project root to change the options on all
+four routes. Use the `detectPdf` section for detection and `generateReplies` for replies.
+
+- **Add a preset** by copying an object in `presets` and editing its fields.
+- **Change a preset** by editing its `label`, `model`, or `generationConfig`. Give each preset
+  a unique `id` within its task. Multiple presets can use the same model with different settings.
+- **Change the default** by setting `defaultPreset` to the desired preset's `id`.
+- **Remove a preset** by deleting its object. If it was the default, choose another default.
+  Keep at least one preset in each task.
+
+For example, this is a complete preset entry for the `generateReplies.presets` list.
+
+```json
+{
+  "id": "argon-medium",
+  "label": "Argon 4 Medium",
+  "model": "gemini-4-argon",
+  "generationConfig": {
+    "mediaResolution": "MEDIA_RESOLUTION_HIGH",
+    "thinkingConfig": { "thinkingLevel": "medium" }
+  }
+}
+```
+
+`generationConfig` is optional and passed through to Gemini as written. Use fields and values
+supported by that model. Save the file and refresh the workflow page to see the new options.
+The running server reads the file at request time, so edits require no restart or rebuild.
+Refresh before uploading a packet, since reloading the page clears the editor state. If the file
+changes while a page is open, pressing a task button re-reads the list first. When the selected
+preset was removed, the button stops before uploading anything and asks you to choose again.
+A failed Detect PDF keeps the current letters and uploaded PDF, so you can still generate replies.
+
+### Migrating model settings from `.env.local`
+
+The app no longer reads `GEMINI_*MODEL` variables. While any are still set, the toolbar and the
+server console name them (never their values). Move each one into `model-presets.json`, then
+delete it from `.env.local`. Keep your API key and any timeout or debug settings in `.env.local`.
+
+| Old variable | Where it goes now |
+|---|---|
+| `GEMINI_DETECT_PDF_MODEL`, `GEMINI_PS_DETECT_PDF_MODEL`, `GEMINI_DUA_URDU_DETECT_PDF_MODEL`, `GEMINI_PS_URDU_DETECT_PDF_MODEL` | A preset in `detectPdf.presets`. Set `detectPdf.defaultPreset` to use it by default. |
+| `GEMINI_GENERATE_REPLIES_MODEL`, `GEMINI_PS_GENERATE_REPLIES_MODEL`, `GEMINI_DUA_URDU_GENERATE_REPLIES_MODEL`, `GEMINI_PS_URDU_GENERATE_REPLIES_MODEL` | A preset in `generateReplies.presets`. Set `generateReplies.defaultPreset` to use it by default. |
+| `GEMINI_ARGON_MODEL` | The `model` field of the `argon-medium` and `argon-high` presets. |
+| `GEMINI_MODEL` | The `model` field of whichever presets should use it. |
+
+Defaults now apply to all four routes. A route can no longer have its own default model, so
+choose a different model from the dropdown on that route when needed.
 
 ## Gemini request details
 
@@ -128,14 +165,13 @@ Model selection is intentionally route-specific:
 - `lib/gemini.ts`
   - Shared Gemini request helper.
   - Accepts the selected model explicitly from each route.
-- `lib/aiModelConfig.ts`
-  - Master AI model config for Detect PDF and Generate Replies.
-  - Exposes `getDetectPdfModel()` and `getGenerateRepliesModel()` with environment variable overrides.
+- `model-presets.json` and `lib/modelPresets.ts`
+  - Shared preset configuration, validation, and task-specific model lookup.
 - `lib/letterProcessors.ts`
   - Per-letter plugin pipeline for generation with `beforeGenerate` and `afterGenerate` hooks.
   - Use this for feature additions that need letter-level transformations or policies.
-- `lib/toolbarConfig.ts`
-  - Declarative toolbar action list (labels/order/variants).
+- `components/Toolbar.tsx`
+  - Shared task buttons and model selectors.
   - To add a new button, define it here and wire behavior in `app/page.tsx`.
 - `lib/inquiryPhraseButtons.ts`
   - Declarative list of small buttons that insert preset text into the Inquiry textarea.

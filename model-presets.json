@@ -1,0 +1,57 @@
+{
+  "detectPdf": {
+    "defaultPreset": "gemini-2.5-flash",
+    "presets": [
+      {
+        "id": "gemini-2.5-flash",
+        "label": "Gemini 2.5 Flash",
+        "model": "gemini-2.5-flash",
+        "generationConfig": {
+          "mediaResolution": "MEDIA_RESOLUTION_HIGH",
+          "temperature": 0.1
+        }
+      }
+    ]
+  },
+  "generateReplies": {
+    "defaultPreset": "argon-medium",
+    "presets": [
+      {
+        "id": "argon-medium",
+        "label": "Argon 4 Medium",
+        "model": "gemini-4-argon",
+        "generationConfig": {
+          "mediaResolution": "MEDIA_RESOLUTION_HIGH",
+          "thinkingConfig": { "thinkingLevel": "medium" }
+        }
+      },
+      {
+        "id": "argon-high",
+        "label": "Argon 4 High",
+        "model": "gemini-4-argon",
+        "generationConfig": {
+          "mediaResolution": "MEDIA_RESOLUTION_HIGH",
+          "thinkingConfig": { "thinkingLevel": "high" }
+        }
+      },
+      {
+        "id": "gemini-3.1-pro-preview",
+        "label": "Gemini 3.1 Pro Preview",
+        "model": "gemini-3.1-pro-preview",
+        "generationConfig": {
+          "mediaResolution": "MEDIA_RESOLUTION_HIGH",
+          "temperature": 0.1
+        }
+      },
+      {
+        "id": "gemini-2.5-flash",
+        "label": "Gemini 2.5 Flash",
+        "model": "gemini-2.5-flash",
+        "generationConfig": {
+          "mediaResolution": "MEDIA_RESOLUTION_HIGH",
+          "temperature": 0.1
+        }
+      }
+    ]
+  }
+}
