@@ -102,9 +102,8 @@ Process ALL requested letters below. For each item:
 
     Construction rules:
     - Must be exactly two sentences: (1) the acknowledgment sentence beginning with the required prefix, then (2) the fixed sentence "Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers."
-    - The acknowledgment sentence must be a single, concise sentence with no compound or multiple unrelated clauses.
+    - The acknowledgment sentence must be a single, concise sentence with no compound or multiple clauses.
     - Focus on the primary concern or request expressed in the letter.
-    - Avoid vague wording like "various matters" or "several issues".
     - Avoid unnecessary background details.
     - Avoid combining multiple topics in one sentence.
   </field>
@@ -121,7 +120,7 @@ Process ALL requested letters below. For each item:
     Tone and approach:
     - Favour an elegant, generic, and uplifting tone over specificity. Brevity and graciousness are preferred over depth and detail.
     - Avoid being overly direct about the difficulty itself; naming it plainly can cause the recipient unease.
-    - Do NOT restate distressing specifics from the letter (for example a diagnosis, a conflict, a bereavement, or a failure). Frame every prayer around positive outcomes and broader blessings.
+    - Do NOT restate distressing specifics from the letter (for example a diagnosis, a conflict, or a failure). Frame every prayer around positive outcomes and broader blessings.
     - The inquiry already names the specific concern, so the prayer should relate to the situation only in a generic way and need not repeat the specifics.
 
     Anonymisation:
@@ -140,7 +139,7 @@ Process ALL requested letters below. For each item:
     <comparative_examples>
       <example theme="pregnancy_and_career">
         <avoid>May He bless you with a healthy pregnancy and grant you the wisdom to maintain an ideal balance between your professional aspirations and family life.</avoid>
-        <prefer>May He bless you with a healthy pregnancy and enable you to fulfil your professional and family responsibilities in the best possible manner.</prefer>
+        <prefer>May He bless you with a healthy pregnancy and enable you to fulfil your responsibilities in the best possible manner.</prefer>
         <reasoning>The preferred version is more generic and elegant, avoiding overly direct framing of the issue.</reasoning>
       </example>
       <example theme="child_development">
@@ -150,13 +149,13 @@ Process ALL requested letters below. For each item:
       </example>
       <example theme="illness_and_pain">
         <avoid>May Allah Taala grant your daughter complete healing and relief from her pain, guiding her treatment towards a full recovery and bestowing upon her an excellent destiny.</avoid>
-        <prefer>May Allah Taala grant your daughter relief and complete restoration of her health and keep her under His divine care.</prefer>
+        <prefer>May Allah Taala grant your daughter complete restoration of her health, keeping her under His divine care.</prefer>
         <reasoning>The preferred version is shorter and more merciful, omitting unnecessary detail that could cause unease.</reasoning>
       </example>
     </comparative_examples>
 
     <reference_prayers note="prayer text only; included to illustrate generic, well-formed prayers">
-      - "May Allah Taala grant you success in your academic pursuits. May He increase your intellectual and secular abilities and guide you on the right path. May Allah always be with you, keeping you under His divine care. Amin"
+      - "May Allah Taala grant you success in your academic pursuits. May He increase your intellectual and secular abilities. May Allah always be with you, keeping you under His divine care. Amin"
       - "May Allah Taala grant your son strength and resilience. May He provide him with patience and perseverance and protect him from every difficulty. May your family find peace and stability and may Allah always be with you all. Amin"
       - "May Allah Taala remove every difficulty pertaining to your business and grant you peace and prosperity. May He provide you with the best outcomes and may your efforts bear many fruits. May Allah always be with you. Amin"
     </reference_prayers>
@@ -175,8 +174,8 @@ Process ALL requested letters below. For each item:
         "letter_id": "L001",
         "full_name": "Ahmad Hassan",
         "location": "Toronto, Canada",
-        "inquiry": "Huzoor Anwar (may Allah be his Helper) has received your letter requesting prayers regarding your wife's treatment who is undergoing some pregnancy complications. Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers.",
-        "prayer_sentence": "May Allah Taala grant your wife complete healing, an easy and safe delivery and bless you and your family with a healthy and righteous child, who becomes a source of comfort for you all. May Allah always be with your growing family and keep you in His care. Amin"
+        "inquiry": "Huzoor Anwar (may Allah be his Helper) has received your letter requesting prayers regarding your wife's treatment concerning her pregnancy complications. Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers.",
+        "prayer_sentence": "May Allah Taala grant your wife healing, an easy and safe delivery and bless you and your family with a healthy and righteous child. May Allah always be with your growing family and keep you under His care. Amin"
       }
     </output>
   </example>
@@ -192,7 +191,7 @@ Process ALL requested letters below. For each item:
         "full_name": "Fatima Ali",
         "location": "London, UK",
         "inquiry": "Huzoor Anwar (may Allah be his Helper) has received your letter requesting prayers for success in your university applications. Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers.",
-        "prayer_sentence": "May Allah Taala grant you success in your higher studies and enable you to serve the Jamaat in the best possible way through your academic and professional endeavours. May your aspirations be fulfilled with ease and your efforts crowned with achievement. May Allah always be with you. Amin"
+        "prayer_sentence": "May Allah Taala grant you success in your higher studies and enable you to serve the Jamaat in the best possible way through your academic and professional endeavours. May your aspirations be fulfilled and your efforts crowned with achievement. May Allah always be with you. Amin"
       }
     </output>
   </example>
@@ -208,7 +207,7 @@ Process ALL requested letters below. For each item:
         "full_name": "Muhammad Khan",
         "location": "Karachi, Pakistan",
         "inquiry": "Huzoor Anwar (may Allah be his Helper) has received your letter requesting prayers regarding your business difficulties and financial hardships. Following the perusal of your letter, Huzoor Anwar (aa) has offered his prayers.",
-        "prayer_sentence": "May Allah Taala remove all your financial difficulties and grant you abundant sustenance. May He open the doors of His mercy and blessings upon your business and make it a source of benefit for you and your family. May He always keep you steadfast in faith during times of hardship and grant you patience and contentment. Amin"
+        "prayer_sentence": "May Allah Taala remove all your difficulties and grant you abundant sustenance. May He open the doors of His mercy and blessings upon your business and make it a source of benefit. May He always keep you steadfast in your faith and grant you patience and contentment. Amin"
       }
     </output>
   </example>

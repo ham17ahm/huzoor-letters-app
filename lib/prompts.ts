@@ -82,7 +82,7 @@ ${JSON.stringify(payload, null, 2)}
   </field>
 
   <field name="inquiry">
-    A single formal sentence acknowledging the letter and its primary concern.
+    A single short sentence acknowledging the letter and its primary concern.
 
     Required prefix: "I have received your letter"
     Format pattern: "I have received your letter [requesting/asking/inquiring about/mentioning] [specific matter related to the note]."
@@ -92,20 +92,19 @@ ${JSON.stringify(payload, null, 2)}
     - Focus on the primary concern or request, especially the concern related to that letter's note.
     - Use formal, concise, respectful wording.
     - Use appropriate verbs: requesting, asking, inquiring about, mentioning, seeking guidance regarding.
-    - Avoid vague wording like "various matters" or "several issues".
     - Avoid unnecessary background details.
     - Avoid combining multiple unrelated topics in one sentence.
   </field>
 
   <field name="prayer_sentence">
-    A warm, compassionate, formal prayer tailored to the letter's specific situation.
+    A warm, compassionate, formal prayer tailored to the letter's specific situation, but written in a generic way.
 
     Required prefix: "May Allah Taala"
     Required suffix: "Amin"
 
     Length rules:
     - When the note contains specific guidance: 1-2 sentences.
-    - When the note is "Dua": 2-3 comprehensive phrases covering multiple aspects.
+    - When the note is "Dua": 2-3 short phrases covering aspects dominantly mentioned in the letter.
 
     Construction guidance by topic:
     - Health matters: include healing, comfort, ease of treatment, and family support.
@@ -116,8 +115,7 @@ ${JSON.stringify(payload, null, 2)}
     - General "Dua" letters: expand to include the immediate concern, broader blessings, spiritual growth, and family welfare. Do not depend on any printed note text for these.
 
     General requirements:
-    - Directly relate the prayer to the specific situation described in the letter and the note.
-    - Address both the immediate concern and broader blessings.
+    - Relate the prayer to the dominant situation described in the letter and the note.
     - Maintain a warm, compassionate, and respectful tone throughout.
   </field>
 
@@ -135,8 +133,8 @@ ${JSON.stringify(payload, null, 2)}
         "letter_id": "L001",
         "full_name": "Ahmad Hassan",
         "location": "Toronto, Canada",
-        "inquiry": "I have received your letter requesting guidance regarding your wife's treatment who is undergoing some pregnancy complications.",
-        "prayer_sentence": "May Allah Taala grant your wife an easy and safe delivery and bless you and your family with a healthy and righteous child who becomes a source of comfort for you all. Amin"
+        "inquiry": "I have received your letter requesting guidance regarding your wife's treatment concerning her pregnancy complications.",
+        "prayer_sentence": "May Allah Taala grant your wife an easy and safe delivery and bless you and your family with a healthy and righteous child who becomes the delight of your eyes. Amin"
       }
     </output>
   </example>
@@ -152,7 +150,7 @@ ${JSON.stringify(payload, null, 2)}
         "letter_id": "L002",
         "full_name": "Fatima Ali",
         "location": "London, UK",
-        "inquiry": "I have received your letter requesting prayers for success in your university applications and guidance on how to serve the Jamaat.",
+        "inquiry": "I have received your letter requesting prayers and guidance on how to serve the Jamaat amidst your university studies.",
         "prayer_sentence": "May Allah Taala grant you success in your higher studies and enable you to serve the Jamaat in the best possible way through your academic and professional endeavours. Amin"
       }
     </output>
@@ -170,7 +168,7 @@ ${JSON.stringify(payload, null, 2)}
         "full_name": "Muhammad Khan",
         "location": "Karachi, Pakistan",
         "inquiry": "I have received your letter requesting prayers for your business difficulties and financial hardships.",
-        "prayer_sentence": "May Allah Taala remove all your financial difficulties and grant you abundant sustenance. May He open the doors of His mercy and blessings upon your business and make it a source of benefit for you and your family. May He always keep you steadfast in faith during times of trial and grant you patience and contentment. Amin"
+        "prayer_sentence": "May Allah Taala remove all your difficulties and grant you abundant sustenance. May He open the doors of His mercy and blessings upon your business and make it a source of benefit. May He always keep you steadfast in your faith and grant you patience and contentment. Amin"
       }
     </output>
   </example>
@@ -186,8 +184,8 @@ ${JSON.stringify(payload, null, 2)}
         "letter_id": "L004",
         "full_name": "Sarah Ahmed",
         "location": "Taiwan",
-        "inquiry": "I have received your letter requesting prayers on how to learn Taekwondo effectively.",
-        "prayer_sentence": "May Allah Taala grant you success in your extracurricular activities and always keep you and your family under His protection. Amin"
+        "inquiry": "I have received your letter asking how to learn Taekwondo effectively.",
+        "prayer_sentence": "May Allah Taala grant you success in your extracurricular activities and always keep you and your family under His care and protection. Amin"
       }
     </output>
   </example>
